@@ -31,9 +31,13 @@ from monodrive_ros_bridge.bridge_with_rosbag import MonoRosBridgeWithBag
 
 def main():
 
+    simulator_config_file = 'simulator.json'
+    vehicle_config_file = 'demo.json'
+
     # Simulator configuration defines network addresses for connecting to the simulator and material properties
-    simulator_config = SimulatorConfiguration('simulator.json')
+    simulator_config = SimulatorConfiguration(simulator_config_file)
     sim_config_yaml = yaml.load(json.dumps(simulator_config.configuration))
+    rospy.set_param('monodrive/SimulatorConfig', simulator_config_file)
 
     if rospy.has_param('monodrive/sensors'):
         rospy.delete_param('monodrive/sensors')
@@ -43,8 +47,9 @@ def main():
         rospy.set_param('/monodrive/' + param, sim_config_yaml[param])
 
     # Vehicle configuration defines ego vehicle configuration and the individual sensors configurations
-    vehicle_config = VehicleConfiguration('demo.json')
+    vehicle_config = VehicleConfiguration(vehicle_config_file)
     vehicle_config_yaml = yaml.load(json.dumps(vehicle_config.configuration))
+    rospy.set_param('monodrive/VehicleConfig', vehicle_config_file)
 
     for param in vehicle_config_yaml:
         if param == 'sensors':
@@ -76,9 +81,9 @@ def main():
         rospy.set_param(param_name='curr_episode',
                         param_value=current_eps)
         rospy.set_param(param_name='SimulatorConfig',
-                        param_value='simulator.json')
+                        param_value=simulator_config_file)
         rospy.set_param(param_name='VehicleConfig',
-                        param_value='demo.json')
+                        param_value=vehicle_config_file)
 
         bridge_cls = MonoRosBridgeWithBag if rospy.get_param(
             'rosbag_fname', '') else MonoRosBridge

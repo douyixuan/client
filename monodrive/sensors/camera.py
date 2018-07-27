@@ -223,6 +223,9 @@ class Camera(TkinterSensorUI, BaseSensorPacketized):
         if not self.hdmi_streaming:
             super(Camera, self).stop(simulator)
 
+    def get_fov(self):
+        return self.config['horizontal_fov_angle']
+
 
 class MultiCamera(Camera):
     def __init__(self, idx, config, simulator_config, **kwargs):

@@ -62,6 +62,8 @@ class SensorHandler(object):
         self.process_msg_fun = process_msg_fun
         self.sensor = sensor
         self.name = name
+        self.parent_frame_id = "monodrive"
+        self.frame_id = self.sensor.type + name
 
     def process_sensor_data(self, data, cur_time):
         """
@@ -110,13 +112,11 @@ class LidarHandler(SensorHandler):
             self.process_msg_fun(topic, VelodynePacket(stamp=cur_time, data=new_sensor_data))
 
     def _compute_transform(self, sensor_data, cur_time):
-        parent_frame_id = "monodrive"
-        child_frame_id = self.name
 
         t = TransformStamped()
         t.header.stamp = cur_time
-        t.header.frame_id = parent_frame_id
-        t.child_frame_id = child_frame_id
+        t.header.frame_id = self.parent_frame_id
+        t.child_frame_id = self.frame_id
         t.transform = mono_transform_to_ros_transform(
             self.sensor.get_transform())
 
@@ -142,8 +142,8 @@ class CameraHandler(SensorHandler):
         super(CameraHandler, self).__init__(
             name, sensor=sensor, **kwargs)
 
-        self.topic_image = '/'.join([name, 'image_raw'])
-        self.topic_cam_info = '/'.join([name, 'camera_info'])
+        self.topic_image = '/'.join([self.frame_id, 'image_raw'])
+        self.topic_cam_info = '/'.join([self.frame_id, 'camera_info'])
         self.build_camera_info()
 
     def build_camera_info(self):
@@ -153,7 +153,7 @@ class CameraHandler(SensorHandler):
         camera info doesn't change over time
         """
         camera_info = CameraInfo()
-        camera_info.header.frame_id = self.name
+        camera_info.header.frame_id = self.frame_id
         '''camera_info.width = self.mono_object.ImageSizeX
         camera_info.height = self.mono_object.ImageSizeY
         camera_info.distortion_model = 'plumb_bob'
@@ -164,11 +164,12 @@ class CameraHandler(SensorHandler):
         '''
 
         #TODO FIX THIS TO READ FROM THE VEHICLE_CONFIG
+        camera_info.width = self.sensor.width
         camera_info.height = self.sensor.height
         camera_info.distortion_model = 'plumb_bob'
-        cx = self.sensor.width
-        cy = self.sensor.height
-        fx = 512 / (2.0 * math.tan(45 * math.pi / 360.0))
+        cx = self.sensor.width / 2
+        cy = self.sensor.height / 2
+        fx = cx / (math.tan(self.sensor.get_fov() * math.pi / 360.0))
 
 
         fy = fx
@@ -179,12 +180,12 @@ class CameraHandler(SensorHandler):
         self._camera_info = camera_info
 
     def _compute_sensor_msg(self, sensor_data, cur_time):
-        encoding = 'passthrough'
+        encoding = 'bgra8'
 
         data = np.array(bytearray(sensor_data['image']), dtype=np.uint8).reshape(self.sensor.height, self.sensor.width, 4)
 
         img_msg = cv_bridge.cv2_to_imgmsg(data, encoding=encoding)
-        img_msg.header.frame_id = self.name
+        img_msg.header.frame_id = self.frame_id
         img_msg.header.stamp = cur_time
 
         cam_info = self._camera_info
@@ -194,13 +195,11 @@ class CameraHandler(SensorHandler):
         self.process_msg_fun(self.topic_image, img_msg)
 
     def _compute_transform(self, sensor_data, cur_time):
-        parent_frame_id = "monodrive"
-        child_frame_id = self.name
 
         t = TransformStamped()
         t.header.stamp = cur_time
-        t.header.frame_id = parent_frame_id
-        t.child_frame_id = child_frame_id
+        t.header.frame_id = self.parent_frame_id
+        t.child_frame_id = self.frame_id
 
         # for camera we reorient it to look at the same axis as the opencv projection
         # in order to get easy depth cloud for RGBD camera
@@ -235,7 +234,7 @@ class ImuHandler(SensorHandler):
 
         header = Header()
         header.stamp = cur_time
-        header.frame_id = self.name
+        header.frame_id = self.frame_id
         header.seq = self.seq
 
         msg = Imu()
@@ -260,13 +259,11 @@ class ImuHandler(SensorHandler):
 
 
     def _compute_transform(self, sensor_data, cur_time):
-        parent_frame_id = "monodrive"
-        child_frame_id = self.name
 
         t = TransformStamped()
         t.header.stamp = cur_time
-        t.header.frame_id = parent_frame_id
-        t.child_frame_id = child_frame_id
+        t.header.frame_id = self.parent_frame_id
+        t.child_frame_id = self.frame_id
 
         t.transform = mono_transform_to_ros_transform(
             self.sensor.get_transform())
@@ -296,7 +293,7 @@ class GpsHandler(SensorHandler):
     def _compute_sensor_msg(self, sensor_data, cur_time):
         header = Header()
         header.stamp = cur_time
-        header.frame_id = self.name
+        header.frame_id = self.frame_id
 
         msg = NavSatFix()
         msg.header = header
@@ -315,13 +312,11 @@ class GpsHandler(SensorHandler):
 
 
     def _compute_transform(self, sensor_data, cur_time):
-        parent_frame_id = "monodrive"
-        child_frame_id = self.name
 
         t = TransformStamped()
         t.header.stamp = cur_time
-        t.header.frame_id = parent_frame_id
-        t.child_frame_id = child_frame_id
+        t.header.frame_id = self.parent_frame_id
+        t.child_frame_id = self.frame_id
 
         t.transform = mono_transform_to_ros_transform(
             self.sensor.get_transform())
@@ -351,7 +346,7 @@ class RpmHandler(SensorHandler):
     def _compute_sensor_msg(self, sensor_data, cur_time):
         header = Header()
         header.stamp = cur_time
-        header.frame_id = self.name
+        header.frame_id = self.frame_id
 
         msg = Rpm()
         msg.header = header
@@ -362,13 +357,11 @@ class RpmHandler(SensorHandler):
 
 
     def _compute_transform(self, sensor_data, cur_time):
-        parent_frame_id = "monodrive"
-        child_frame_id = self.name
 
         t = TransformStamped()
         t.header.stamp = cur_time
-        t.header.frame_id = parent_frame_id
-        t.child_frame_id = child_frame_id
+        t.header.frame_id = self.parent_frame_id
+        t.child_frame_id = self.frame_id
 
         t.transform = mono_transform_to_ros_transform(
             self.sensor.get_transform())
@@ -398,7 +391,7 @@ class BoundingBoxHandler(SensorHandler):
     def _compute_sensor_msg(self, sensor_data, cur_time):
         header = Header()
         header.stamp = cur_time
-        header.frame_id = self.name
+        header.frame_id = self.frame_id
 
         msg = BoundingBox(header=header, targets=[])
         for i in range(0, len(sensor_data['distances'])):
@@ -413,13 +406,11 @@ class BoundingBoxHandler(SensorHandler):
         self.process_msg_fun('boundingbox', msg)
 
     def _compute_transform(self, sensor_data, cur_time):
-        parent_frame_id = "monodrive"
-        child_frame_id = self.name
 
         t = TransformStamped()
         t.header.stamp = cur_time
-        t.header.frame_id = parent_frame_id
-        t.child_frame_id = child_frame_id
+        t.header.frame_id = self.parent_frame_id
+        t.child_frame_id = self.frame_id
 
         t.transform = mono_transform_to_ros_transform(
             self.sensor.get_transform())
@@ -449,7 +440,7 @@ class WaypointHandler(SensorHandler):
     def _compute_sensor_msg(self, sensor_data, cur_time):
         header = Header()
         header.stamp = cur_time
-        header.frame_id = self.name
+        header.frame_id = self.frame_id
 
         msg = Waypoint(current_lane=sensor_data['lane_number'], lanes=[])
         for i in range(0, len(sensor_data['points_by_lane'])):
@@ -462,13 +453,11 @@ class WaypointHandler(SensorHandler):
         self.process_msg_fun('waypoint', msg)
 
     def _compute_transform(self, sensor_data, cur_time):
-        parent_frame_id = "monodrive"
-        child_frame_id = self.name
 
         t = TransformStamped()
         t.header.stamp = cur_time
-        t.header.frame_id = parent_frame_id
-        t.child_frame_id = child_frame_id
+        t.header.frame_id = self.parent_frame_id
+        t.child_frame_id = self.frame_id
 
         t.transform = mono_transform_to_ros_transform(
             self.sensor.get_transform())
