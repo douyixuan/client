@@ -28,6 +28,7 @@ from monodrive import Simulator, SimulatorConfiguration, VehicleConfiguration
 from monodrive_ros_bridge.markers import PlayerAgentHandler, NonPlayerAgentsHandler
 from monodrive_ros_bridge.sensors import BoundingBoxHandler, CameraHandler, \
     GpsHandler, LidarHandler, ImuHandler, RpmHandler, WaypointHandler
+from monodrive_ros_bridge.world import WorldMapHandler
 
 from monodrive.vehicles import SimpleVehicle
 
@@ -199,6 +200,16 @@ class MonoRosBridge(object):
 
 #            rospy.loginfo("waiting for data")
 #            self.vehicle.sensor_data_ready.wait()
+
+            # handle time
+            vehicle_transform, game_time = self.vehicle.get_transform()
+            game_time = rospy.Time.now()
+            if game_time is not None:
+                self.cur_time = game_time # rospy.Time.from_sec(game_time * 1e-3)
+                self.compute_cur_time_msg()
+                print("gametime:", game_time, "curtime:", self.cur_time)
+
+            self.world_handler.process_msg(self.cur_time)
 
             rospy.loginfo("processing data")
             for sensor in self.vehicle.sensors:

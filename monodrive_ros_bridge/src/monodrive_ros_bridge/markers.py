@@ -85,6 +85,32 @@ class PlayerAgentHandler(AgentObjectHandler):
         self.process_msg_fun(self.name, marker)
         self.process_msg_fun('tf', t)
 
+        header = Header()
+        header.stamp = cur_time
+        header.frame_id = self.name + '_front'
+        marker = get_vehicle_marker(
+            data, header=header, marker_id=1, is_player=True)
+        marker.color.r = 1
+        marker.color.g = 0
+        marker.color.b = 0
+        self.process_msg_fun(self.name + '_front', marker)
+
+        t = TransformStamped()
+        t.header.stamp = cur_time
+        t.header.frame_id = self.name
+        t.child_frame_id = self.name + '_front'
+
+        from geometry_msgs.msg import Transform
+        t.transform = Transform()
+
+        quat = tf.transformations.quaternion_from_euler(0, 0, 0)
+        t.transform.rotation.x = quat[0]
+        t.transform.rotation.y = quat[1]
+        t.transform.rotation.z = quat[2]
+        t.transform.rotation.w = quat[3]
+        t.transform.translation.x = 2
+        self.process_msg_fun('tf', t)
+
 
 class NonPlayerAgentsHandler(AgentObjectHandler):
     """
@@ -154,6 +180,8 @@ def update_marker_pose(object, base_marker):
         mono_Transform(object.bounding_box.transform) *
         mono_Transform(object.transform))
     base_marker.pose = ros_transform_to_pose(ros_transform)
+
+    base_marker.pose.position.z += 0.25
 
     base_marker.scale.x = object.bounding_box.extent.x * 2.0
     base_marker.scale.y = object.bounding_box.extent.y * 2.0
