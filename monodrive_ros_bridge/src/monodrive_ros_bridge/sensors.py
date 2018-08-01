@@ -106,6 +106,7 @@ class LidarHandler(SensorHandler):
             name, sensor=sensor, **kwargs)
 
     def _compute_sensor_msg(self, sensor_data, cur_time):
+        topic = 'velodyne_packets'
         for lidar_packet in sensor_data:
             new_sensor_data = bytes(lidar_packet)
             topic = 'velodyne_packets'
@@ -116,7 +117,7 @@ class LidarHandler(SensorHandler):
         t = TransformStamped()
         t.header.stamp = cur_time
         t.header.frame_id = self.parent_frame_id
-        t.child_frame_id = self.frame_id
+        t.child_frame_id = 'velodyne_points'  # self.frame_id
         t.transform = mono_transform_to_ros_transform(
             self.sensor.get_transform())
 
