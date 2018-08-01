@@ -92,6 +92,8 @@ class MonoRosBridge(object):
         self.mono_game_stamp = 0
         self.mono_platform_stamp = 0
 
+        self.world_handler = WorldMapHandler(
+            "monodrive", process_msg_fun=self.process_msg)
         # creating handler to handle vehicles messages
         self.player_handler = PlayerAgentHandler(
             "player_vehicle", process_msg_fun=self.process_msg)

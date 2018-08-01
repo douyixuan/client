@@ -365,6 +365,7 @@ class RpmHandler(SensorHandler):
         t.child_frame_id = self.frame_id
 
         t.transform = mono_transform_to_ros_transform(
+            self.base_transform *
             self.sensor.get_transform())
 
         rotation = t.transform.rotation
