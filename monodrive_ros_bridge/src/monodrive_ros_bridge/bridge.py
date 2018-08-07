@@ -78,7 +78,11 @@ class MonoRosBridge(object):
         self.vehicle_config = VehicleConfiguration(params['VehicleConfig'])
 
         self.simulator = Simulator(simulator_config)
+        self.simulator.send_simulator_configuration()
+
         self.vehicle = self.simulator.start_vehicle(self.vehicle_config, RosVehicle)
+        self.simulator.send_vehicle_configuration(self.vehicle_config)
+        self.vehicle.start()
 
         self.param_sensors = params.get('sensors', {})
 
@@ -96,9 +100,9 @@ class MonoRosBridge(object):
             "monodrive", process_msg_fun=self.process_msg)
         # creating handler to handle vehicles messages
         self.player_handler = PlayerAgentHandler(
-            "player_vehicle", process_msg_fun=self.process_msg)
-        self.non_players_handler = NonPlayerAgentsHandler(
-            "vehicles", process_msg_fun=self.process_msg)
+            "ego", process_msg_fun=self.process_msg)
+        # self.non_players_handler = NonPlayerAgentsHandler(
+        #    "vehicles", process_msg_fun=self.process_msg)
 
         # creating handler for sensors
         self.sensors = {}
@@ -204,7 +208,7 @@ class MonoRosBridge(object):
 #            self.vehicle.sensor_data_ready.wait()
 
             # handle time
-            vehicle_transform, game_time = self.vehicle.get_transform()
+            vehicle_transform = self.vehicle.get_transform()
             game_time = rospy.Time.now()
             if game_time is not None:
                 self.cur_time = game_time # rospy.Time.from_sec(game_time * 1e-3)
@@ -236,13 +240,13 @@ class MonoRosBridge(object):
             # publish all messages
             self.send_msgs()
 
-            self.vehicle.sensor_data_ready.clear()
+            self.vehicle.all_sensors_ready.clear()
             control_data = self.vehicle.drive(self.vehicle.sensors, None)
             rospy.loginfo("--> {0}".format(control_data))
             self.vehicle.send_control_data(control_data)
 
             rospy.loginfo("waiting for data")
-            self.vehicle.sensor_data_ready.wait()
+            self.vehicle.all_sensors_ready.wait()
 
             '''
             measurements, sensor_data = self.client.read_data()
