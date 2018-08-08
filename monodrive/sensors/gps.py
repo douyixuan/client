@@ -29,7 +29,7 @@ class GPS(TkinterSensorUI, BaseSensor):
         preamble, MSG_POS_LLH, sensor_id, payload_length, lat, lng, elev, loc_x, loc_y, for_x, for_y, for_z, ego_yaw, speed, \
         h_ac, v_ac, sats, status, crc = list(
             struct.unpack(fmt, frame))
-        forward_vector = np.array([for_x, for_y, for_z])
+        forward_vector = np.array([for_x, for_y, 0.0])
         world_location = np.array([loc_x / 100.0, loc_y / 100.0, 0.0])
         data_dict = {
             'time_stamp': time_stamp,
@@ -64,6 +64,8 @@ class GPS(TkinterSensorUI, BaseSensor):
 
     def process_display_data(self):
         data = self.q_display.get()
+        self.world_location = data['world_location']
+        self.forward_vector = data['forward_vector']
         self.string_lat.set('LAT: {0}'.format(data['lat']))
         self.string_lng.set('LNG: {0}'.format(data['lng']))
         self.string_time.set('TIMESTAMP: {0}'.format(data['time_stamp']))

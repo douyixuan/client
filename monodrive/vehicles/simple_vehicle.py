@@ -10,9 +10,9 @@ from . import BaseVehicle
 from monodrive.sensors import Waypoint, GPS
 
 
-k = 1.6  # look forward gain, dependent on vehicle speed
+k = 1.2  # look forward gain, dependent on vehicle speed
 Lfc = 5.0  # look-ahead distance
-max_vel = .3  # Max velocity
+max_vel = .65  # Max velocity
 max_turn_change = .1
 drive_vehicle = True
 
@@ -57,7 +57,6 @@ class SimpleVehicle(BaseVehicle):
         look_ahead_distance = k * vehicle_speed + Lfc
 
         dif = current_waypoint - gps_location[:2:]
-
         L = np.linalg.norm(dif)
 
         # Find target point by searching distances from ego up to look ahead distance
@@ -71,8 +70,8 @@ class SimpleVehicle(BaseVehicle):
         target_point = np.append(target_point, [0.0])
         # make 2d ad 3d vector
 
-        dt = self.waypoint_sensor.game_time / 1000.0 - self.last_time
-        self.last_time = self.waypoint_sensor.game_time / 1000.0
+        dt = self.waypoint_sensor.last_game_time.value / 1000.0 - self.last_time
+        self.last_time = self.waypoint_sensor.last_game_time.value / 1000.0
 
         # Find the difference from the current gps location and the target point
         dif = np.subtract(target_point, self.gps_sensor.world_location)
@@ -94,6 +93,13 @@ class SimpleVehicle(BaseVehicle):
         forward_intention = np.array(norm)
         forward = np.dot(self.gps_sensor.forward_vector, forward_intention)
         right = np.cross(self.gps_sensor.forward_vector, forward_intention)[2]  # get z vector for rotation
+
+        if math.isnan(forward):
+            forward = 0
+        if math.isnan(right):
+            right = 0
+
+        forward = min(max_vel, forward)
 
         if drive_vehicle:
             return {

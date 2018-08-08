@@ -1,8 +1,8 @@
 {
   "id": "basic_configuration",
-  "clock_mode": 2,
+  "clock_mode": 1,
   "lane_number": 0,
-  "position": 22000,
+  "position": 0,
   "bounding_data_on_radar_graph": true,
   "bounding_data_on_camera": true,
   "spawning_rotation": {
@@ -76,7 +76,7 @@
       "max_distance": 8000.0,
       "vertical_fov_angle": 30.0,
       "horizontal_resolution": 0.4,
-      "fps": 5.0,
+      "fps": 2.0,
       "n_lasers": 32,
       "reset_angle": 0.0
     },
@@ -100,7 +100,7 @@
       },
       "max_distance": 50000.0,
       "horizontal_fov_angle": 50.0,
-      "fps": 10,
+      "fps": 2,
       "stream_dimensions": {
         "x":512.0,
         "y":512.0
@@ -126,11 +126,11 @@
         "yaw":0.0,
         "roll":0.0
       },
-      "fps": 5.0
+      "fps": 2.0
     },
     {
       "type": "Waypoint",
-      "id": "4",
+      "id": "0",
       "packet_size": 1472,
       "listen_port": 8082,
       "display_process": true,
@@ -146,7 +146,7 @@
         "yaw": 0.0,
         "roll": 0.0
       },
-      "fps": 5.0,
+      "fps": 2.0,
       "point_delta": 100.0,
       "total_points": 500
     },
@@ -168,7 +168,7 @@
         "yaw": 0.0,
         "roll": 0.0
       },
-      "fps": 5.0
+      "fps": 2.0
     },
     {
       "type": "IMU",
@@ -188,27 +188,7 @@
         "yaw":0.0,
         "roll":0.0
       },
-      "fps": 10.0
-    },
-    {
-      "type": "RPM",
-      "id": "0",
-      "packet_size": 1472,
-      "listen_port": 8085,
-      "display_process": true,
-      "sensor_process": true,
-      "location": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-      },
-      "rotation": {
-        "pitch": 0,
-        "yaw": 0,
-        "roll": 0
-      },
-      "fps": 1,
-      "wheel_number": 0
+      "fps": 2.0
     }
   ]
 }
