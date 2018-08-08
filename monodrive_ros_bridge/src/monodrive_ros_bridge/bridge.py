@@ -42,7 +42,7 @@ class RosVehicle(SimpleVehicle):
     def start(self):
         rospy.loginfo("starting vehicle process")
         self.running = True
-        super(RosVehicle, self).start()
+        super(RosVehicle, self).start(False)
 
     def run(self):
         rospy.loginfo("running vehicle process")
@@ -217,10 +217,14 @@ class MonoRosBridge(object):
 
             self.world_handler.process_msg(self.cur_time)
 
+            # handle agents
+            self.player_handler.process_msg(
+                vehicle_transform, cur_time=self.cur_time)
+
             rospy.loginfo("processing data")
             for sensor in self.vehicle.sensors:
                 if self.sensors.get(sensor.type, None):
-                    rospy.loginfo("getting data from {0}{1}".format(sensor.type,sensor.sensor_id))
+                    rospy.loginfo("getting data from {0}{1}".format(sensor.type, sensor.sensor_id))
 
                     processor = None
                     sensors = self.sensors[sensor.type]

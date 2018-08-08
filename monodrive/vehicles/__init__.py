@@ -12,6 +12,10 @@ from monodrive import SensorManager
 from monodrive.networking import messaging
 
 from monodrive.sensors import GPS, Waypoint
+from monodrive.transform import Rotation, Transform, Translation
+
+import tf
+import numpy as np
 
 
 class BaseVehicle(object):
@@ -30,12 +34,15 @@ class BaseVehicle(object):
         self.vehicle_state = None
         self.previous_control_sent_time = None
         self.control_thread = None
+        self.spawning_rotation = vehicle_config.spawning_rotation
+        self.gps_sensor = GPS.get_sensor(self.sensors)
 
-    def start(self):
+    def start(self, start_control = True):
         self.sensor_manager.start()
         self.previous_control_sent_time = time.time()
-        self.control_thread = threading.Thread(target=self.control_monitor)
-        self.control_thread.start()
+        if start_control:
+            self.control_thread = threading.Thread(target=self.control_monitor)
+            self.control_thread.start()
 
     def start_scenario(self, scenario):
         self.scenario = scenario
@@ -99,10 +106,35 @@ class BaseVehicle(object):
 
     def get_sensor(self, sensor_type, id):
         for sensor in self.sensors:
-            if sensor.type == sensor_type and sensor.sensor_id == id:
+            if sensor.type == sensor_type and (id is None or sensor.sensor_id == id):
                 return sensor
         return None
 
+    def get_transform(self):
+        position = self.gps_sensor.world_location
+        forward = self.gps_sensor.forward_vector
+        if forward is not None:
+            rotation = self.calculate_rotation(forward)
+        else:
+            rotation = None
+        print("position", position)
+        print("rotation", rotation)
+        if position is not None and rotation is not None:
+            transform = Transform(Translation(position[0], position[1], position[2]),
+                                  rotation)
+            x, y, z = tf.transformations.translation_from_matrix(transform.matrix)
+            print("transform xyz", x, y, z)
+            return transform
+        elif position:
+            return Transform(Translation(position[0], position[1], position[2]))
+        elif rotation:
+            return Transform(rotation)
+
+        return None
+
+    def calculate_rotation(selfs, forward):
+        roll, pitch, yaw = tf.transformations.euler_from_quaternion(np.append(forward, [0.0]))
+        return Rotation(pitch, yaw, roll)
 
 class VehicleState:
     def __init__(self):

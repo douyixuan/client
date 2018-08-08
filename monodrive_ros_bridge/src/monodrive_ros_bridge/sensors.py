@@ -62,7 +62,7 @@ class SensorHandler(object):
         self.process_msg_fun = process_msg_fun
         self.sensor = sensor
         self.name = name
-        self.parent_frame_id = "monodrive"
+        self.parent_frame_id = "ego"
         self.frame_id = self.sensor.type + name
 
     def process_sensor_data(self, data, cur_time):

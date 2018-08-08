@@ -86,7 +86,8 @@ class Transform(object):
         for param in args:
             if not isinstance(param, Translation) and \
                not isinstance(param, Rotation) and \
-               not isinstance(param, Scale):
+               not isinstance(param, Scale) and \
+               not isinstance(param, Transform):
                 raise TypeError(
                     "'" + str(type(param)) + "' type not match with \
                     'Translation', 'Rotation' or 'Scale'")

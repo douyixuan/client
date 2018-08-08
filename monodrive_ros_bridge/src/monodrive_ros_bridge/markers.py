@@ -23,7 +23,7 @@ from visualization_msgs.msg import MarkerArray, Marker
 
 from monodrive.transform import Transform as mono_Transform
 from monodrive_ros_bridge.transforms import mono_transform_to_ros_transform, ros_transform_to_pose
-
+import tf
 
 class AgentObjectHandler(object):
     """
@@ -31,9 +31,9 @@ class AgentObjectHandler(object):
     In monodrive_ros_bridge messages are represented as Marker message (thus they are viewable in Rviz).
     """
 
-    def __init__(self, name, process_msg_fun=None, world_link='map'):
+    def __init__(self, name, process_msg_fun=None, world_frame='monodrive'):
         self.name = name
-        self.world_link = world_link
+        self.world_frame = world_frame
         self.process_msg_fun = process_msg_fun
         self.lookup_table_marker_id = {}
 
@@ -73,13 +73,21 @@ class PlayerAgentHandler(AgentObjectHandler):
     def process_msg(self, data, cur_time):
         t = TransformStamped()
         t.header.stamp = cur_time
-        t.header.frame_id = self.world_link
-        t.child_frame_id = "base_link"
-        t.transform = mono_transform_to_ros_transform(
-            mono_Transform(data.transform))
+        t.header.frame_id = self.world_frame
+        t.child_frame_id = self.name
+
+        if data is None:
+            return
+
+        x, y, z = tf.transformations.translation_from_matrix(data.matrix)
+        # print("transform xyz", x, y, z)
+
+        t.transform = mono_transform_to_ros_transform(data)
+        # print("tf t", t.transform.translation)
+        # print("tf r", t.transform.rotation)
         header = Header()
         header.stamp = cur_time
-        header.frame_id = self.world_link
+        header.frame_id = self.name
         marker = get_vehicle_marker(
             data, header=header, marker_id=0, is_player=True)
         self.process_msg_fun(self.name, marker)
@@ -130,7 +138,7 @@ class NonPlayerAgentsHandler(AgentObjectHandler):
         vehicles = [(self.get_marker_id(agent.id), agent.vehicle)
                     for agent in data if agent.HasField('vehicle')]
 
-        header = Header(stamp=cur_time, frame_id=self.world_link)
+        header = Header(stamp=cur_time, frame_id=self.world_frame)
         if not (vehicles):
             return
         markers = [
@@ -176,15 +184,24 @@ def update_marker_pose(object, base_marker):
     :param object: pb2 mono object
     :param base_marker: marker to update pose
     """
+    #print("ego m", object.matrix)
+
     ros_transform = mono_transform_to_ros_transform(
-        mono_Transform(object.bounding_box.transform) *
-        mono_Transform(object.transform))
+        # mono_Transform(object.bounding_box.transform) *
+        mono_Transform(object))
     base_marker.pose = ros_transform_to_pose(ros_transform)
 
-    base_marker.pose.position.z += 0.25
+    base_marker.pose.position.z += 1.25
 
-    base_marker.scale.x = object.bounding_box.extent.x * 2.0
-    base_marker.scale.y = object.bounding_box.extent.y * 2.0
-    base_marker.scale.z = object.bounding_box.extent.z * 2.0
+    base_marker.scale.x = 9.66
+    base_marker.scale.y = 4.09
+    base_marker.scale.z = 2.51
+
+    #print("base_marker t", base_marker.pose.position)
+    #print("base_marker r", base_marker.pose.orientation)
+
+    # base_marker.scale.x = object.bounding_box.extent.x * 2.0
+    # base_marker.scale.y = object.bounding_box.extent.y * 2.0
+    # base_marker.scale.z = object.bounding_box.extent.z * 2.0
 
     base_marker.type = Marker.CUBE

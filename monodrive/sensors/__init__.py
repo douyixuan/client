@@ -392,10 +392,10 @@ class BaseSensor(multiprocessing.Process):
         position = self.config.get("location", None)
         rotation = self.config.get("rotation", None)
         if position and rotation:
-            return Transform(Translation(position['x'], position['y'], position['z']),
+            return Transform(Translation(position['x'] / 100.0, position['y'] / 100.0, position['z'] / 100.0),
                              Rotation(rotation['pitch'], rotation['yaw'], rotation['roll']))
         elif position:
-            return Transform(Translation(position['x'], position['y'], position['z']))
+            return Transform(Translation(position['x'] / 100.0, position['y'] / 100.0, position['z'] / 100.0))
         elif rotation:
             return Transform(Rotation(rotation['pitch'], rotation['yaw'], rotation['roll']))
 
