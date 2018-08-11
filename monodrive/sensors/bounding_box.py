@@ -11,6 +11,7 @@ import matplotlib.patches as patches
 
 from . import BaseSensorPacketized
 from .gui import MatplotlibSensorUI
+from monodrive.transform import Rotation, Transform, Translation
 
 matplotlib.use('TkAgg')
 
@@ -30,6 +31,10 @@ class BoundingBox(MatplotlibSensorUI, BaseSensorPacketized):
         self.y_bounds = None
         self.box_rotations = None
         self.velocities = None
+
+    def get_transform(self):
+        return Transform(Translation(0, 0, 0.75),
+                         Rotation(0, 90, 0))
 
     @classmethod
     def parse_frame(cls, frame, time_stamp, game_time):
@@ -54,8 +59,8 @@ class BoundingBox(MatplotlibSensorUI, BaseSensorPacketized):
             angles = np.multiply(targets[:, 1], -1)
             x_points = target_points[:, 0]
             y_points = target_points[:, 1]
-            x_bounds = targets[:, 3]
-            y_bounds = targets[:, 2]
+            x_bounds = targets[:, 2]
+            y_bounds = targets[:, 3]
             z_bounds = targets[:, 4]
             box_rotations = np.multiply(targets[:, 5], -1)
             velocities = targets[:, 6]

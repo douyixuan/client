@@ -32,7 +32,7 @@ from monodrive_ros_bridge.bridge_with_rosbag import MonoRosBridgeWithBag
 def main():
 
     simulator_config_file = 'simulator.json'
-    vehicle_config_file = 'demo.json'
+    vehicle_config_file = 'ros.json'
 
     # Simulator configuration defines network addresses for connecting to the simulator and material properties
     simulator_config = SimulatorConfiguration(simulator_config_file)

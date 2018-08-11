@@ -398,7 +398,7 @@ class BoundingBoxHandler(SensorHandler):
         msg = BoundingBox(header=header, targets=[])
         for i in range(0, len(sensor_data['distances'])):
             msg.targets.append(Target(id=i, distance=sensor_data['distances'][i], angle=sensor_data['angles'][i],
-                                      relative_rotation=sensor_data['box_rotations'][i],
+                                      relative_rotation=sensor_data['box_rotations'][i]+90,
                                       velocity=sensor_data['velocities'][i],
                                       #in_radar_fov=sensor_data['radar_distances'][i],
                                       center=Point(x=sensor_data['x_points'][i], y=sensor_data['y_points'][i]),
@@ -417,15 +417,12 @@ class BoundingBoxHandler(SensorHandler):
         t.transform = mono_transform_to_ros_transform(
             self.sensor.get_transform())
 
-        rotation = t.transform.rotation
-        quat = [rotation.x, rotation.y, rotation.z, rotation.w]
-        quat_swap = tf.transformations.quaternion_from_matrix(
-            [[0, 0, 1, 0],
-             [-1, 0, 0, 0],
-             [0, -1, 0, 0],
-             [0, 0, 0, 1]])
-        quat = tf.transformations.quaternion_multiply(quat, quat_swap)
-
+        # for some reasons lidar sends already rotated cloud,
+        # so it is need to ignore pitch and roll
+        r = t.transform.rotation
+        quat = [r.x, r.y, r.z, r.w]
+        roll, pitch, yaw = tf.transformations.euler_from_quaternion(quat)
+        quat = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
         t.transform.rotation.x = quat[0]
         t.transform.rotation.y = quat[1]
         t.transform.rotation.z = quat[2]

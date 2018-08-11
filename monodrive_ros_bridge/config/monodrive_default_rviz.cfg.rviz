@@ -1,19 +1,8 @@
 Panels:
-  - Class: rviz/Displays
-    Help Height: 102
-    Name: Displays
-    Property Tree Widget:
-      Expanded:
-        - /Global Options1
-        - /Status1
-        - /DepthCloud1/Auto Size1
-      Splitter Ratio: 0.5
-    Tree Height: 334
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
     Expanded:
-      - /2D Pose Estimate1
       - /2D Nav Goal1
       - /Publish Point1
     Name: Tool Properties
@@ -24,30 +13,30 @@ Panels:
     Name: Views
     Splitter Ratio: 0.5
   - Class: rviz/Time
-    Experimental: true
+    Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: Front_cam
+    SyncSource: Image
   - Class: rviz/Displays
     Help Height: 0
     Name: Displays
     Property Tree Widget:
       Expanded:
-        - /Global Options1
-        - /non_player_vehicles1
-        - /DepthCloud1/Auto Size1
-      Splitter Ratio: 0.4943566620349884
-    Tree Height: 170
+        - /Grid1/Line Style1
+      Splitter Ratio: 0.44711539149284363
+    Tree Height: 345
+Preferences:
+  PromptSaveOnExit: true
 Visualization Manager:
   Class: ""
   Displays:
-    - Alpha: 0.10000000149011612
-      Cell Size: 1
+    - Alpha: 1
+      Cell Size: 3
       Class: rviz/Grid
-      Color: 170; 164; 162
+      Color: 85; 87; 83
       Enabled: true
       Line Style:
-        Line Width: 0.029999999329447746
+        Line Width: 0.009999999776482582
         Value: Lines
       Name: Grid
       Normal Cell Count: 0
@@ -57,47 +46,7 @@ Visualization Manager:
         Z: 0
       Plane: XY
       Plane Cell Count: 1000
-      Reference Frame: map
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /camera_front/image_raw
-      Max Value: 1
-      Median window: 5
-      Min Value: 0
-      Name: Front_cam
-      Normalize Range: true
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      Value: true
-    - Class: rviz/Image
-      Enabled: true
-      Image Topic: /camera_depth/image_raw
-      Max Value: 30
-      Median window: 5
-      Min Value: 0
-      Name: Depth
-      Normalize Range: false
-      Queue Size: 2
-      Transport Hint: raw
-      Unreliable: false
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: /vehicles
-      Name: non_player_vehicles
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
-    - Class: rviz/Marker
-      Enabled: true
-      Marker Topic: /player_vehicle
-      Name: Marker
-      Namespaces:
-        "": true
-      Queue Size: 100
+      Reference Frame: monodrive
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -111,67 +60,133 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: false
+      Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 4096
+      Max Intensity: 233
       Min Color: 0; 0; 0
       Min Intensity: 0
       Name: PointCloud2
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
-      Size (Pixels): 3
-      Size (m): 0.009999999776482582
-      Style: Flat Squares
-      Topic: /lidar_0
+      Size (Pixels): 2.5
+      Size (m): 0.05000000074505806
+      Style: Points
+      Topic: /velodyne_points
       Unreliable: false
       Use Fixed Frame: true
       Use rainbow: true
-      Value: false
-    - Alpha: 1
-      Auto Size:
-        Auto Size Factor: 1
-        Value: true
-      Autocompute Intensity Bounds: true
-      Autocompute Value Bounds:
-        Max Value: 10
-        Min Value: -10
-        Value: true
-      Axis: Z
-      Channel Name: intensity
-      Class: rviz/DepthCloud
-      Color: 255; 255; 255
-      Color Image Topic: /camera_front/image_raw
-      Color Transformer: RGB8
-      Color Transport Hint: raw
-      Decay Time: 0
-      Depth Map Topic: /camera_depth/image_raw
-      Depth Map Transport Hint: raw
-      Enabled: true
-      Invert Rainbow: false
-      Max Color: 255; 255; 255
-      Max Intensity: 4096
-      Min Color: 0; 0; 0
-      Min Intensity: 0
-      Name: DepthCloud
-      Occlusion Compensation:
-        Occlusion Time-Out: 30
-        Value: false
-      Position Transformer: XYZ
-      Queue Size: 5
-      Selectable: true
-      Size (Pixels): 3
-      Style: Flat Squares
-      Topic Filter: false
-      Use Fixed Frame: true
-      Use rainbow: true
       Value: true
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /Camera0/image_raw
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Image
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        BoundingBox0:
+          Value: true
+        BoundingBox1:
+          Value: true
+        Camera0:
+          Value: true
+        GPS0:
+          Value: true
+        IMU0:
+          Value: true
+        Lidar0:
+          Value: true
+        Waypoint0:
+          Value: true
+        ego:
+          Value: true
+        monodrive:
+          Value: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        monodrive:
+          ego:
+            BoundingBox0:
+              {}
+            BoundingBox1:
+              {}
+            Camera0:
+              {}
+            GPS0:
+              {}
+            IMU0:
+              {}
+            Lidar0:
+              {}
+            Waypoint0:
+              {}
+      Update Interval: 0
+      Value: true
+    - Alpha: 0.5
+      Class: monodrive_rviz_plugin/BoundingBox
+      Color: 191; 64; 149
+      Enabled: true
+      Name: BoundingBox
+      Topic: /boundingbox
+      Unreliable: false
+      Value: true
+    - Alpha: 1
+      Class: rviz_plugin_tutorials/Imu
+      Color: 204; 51; 204
+      Enabled: true
+      History Length: 1
+      Name: Imu
+      Topic: /imu
+      Unreliable: false
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /ego
+      Name: Marker
+      Namespaces:
+        "": true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Camera
+      Enabled: true
+      Image Rendering: background and overlay
+      Image Topic: /Camera0/image_raw
+      Name: Camera
+      Overlay Alpha: 0.5
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+      Visibility:
+        BoundingBox: true
+        Grid: true
+        Image: true
+        Imu: true
+        Marker: true
+        PointCloud2: true
+        TF: true
+        Value: true
+      Zoom Factor: 1
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
     Default Light: true
-    Fixed Frame: map
+    Fixed Frame: monodrive
     Frame Rate: 30
   Name: root
   Tools:
@@ -192,64 +207,45 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 31.861072540283203
+      Distance: 40
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 6.999748229980469
-        Y: 0.7988636493682861
-        Z: 2.896774276450742e-6
-      Focal Shape Fixed Size: false
-      Focal Shape Size: 0.05000000074505806
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.0020000000949949026
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.18520352244377136
-      Target Frame: base_link
+      Pitch: 0.20000000298023224
+      Target Frame: ego
       Value: ThirdPersonFollower (rviz)
-      Yaw: 3.5035617351531982
-    Saved:
-      - Class: rviz/FPS
-        Enable Stereo Rendering:
-          Stereo Eye Separation: 0.05999999865889549
-          Stereo Focal Distance: 1
-          Swap Stereo Eyes: false
-          Value: false
-        Invert Z Axis: false
-        Name: FPS
-        Near Clip Distance: 0.009999999776482582
-        Pitch: 0.984796941280365
-        Position:
-          X: 48.14033508300781
-          Y: -258.651123046875
-          Z: 284.4742431640625
-        Target Frame: base_link
-        Value: FPS (rviz)
-        Yaw: 1.521981120109558
+      Yaw: 3.140000104904175
+    Saved: ~
 Window Geometry:
-  "&Displays":
-    collapsed: false
-  "&Tool Properties":
-    collapsed: false
-  "&Views":
-    collapsed: false
-  Depth:
+  Camera:
     collapsed: false
   Displays:
     collapsed: false
-  Front_&cam:
-    collapsed: false
-  Height: 994
+  Height: 1025
   Hide Left Dock: false
   Hide Right Dock: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000019a0000032bfc020000000afb0000001200530065006c0065006300740069006f006e00000001e10000009b0000007601000003fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007300000000430000032d000000f601000003fb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000100044006900730070006c0061007900730100000043000000f6000000f601000003fb0000001200460072006f006e0074005f00630061006d010000013a0000011d0000002201000003fb0000000a00440065007000740068010000025800000116000000220100000300000001000001810000032bfc0200000009fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000043000001950000007601000003fb0000000a004400650070007400680000000043000001e80000000000000000fb00000018005300650067006d0065006e0074006100740069006f006e000000017f0000011f0000000000000000fb0000000a0049006d0061006700650000000043000000f60000000000000000fb0000000a0049006d0061006700650000000043000001630000000000000000fb0000001a00630061006d005f00660072006f006e0074005f00720067006200000001a7000001c70000000000000000fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007301000001d900000195000000ce01000003fb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000690000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000006900000004dfc0100000002fb0000000800540069006d0065010000000000000690000002bb01000003fb0000000800540069006d00650100000000000004500000000000000000000003730000032b00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Image:
+    collapsed: false
+  QMainWindow State: 000000ff00000000fd0000000400000000000001ce0000034bfc0200000007fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000005c00fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c0000026100000001000001f900000198fc0200000005fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0049006d00610067006501000001f6000001980000001600fffffffb0000000a0049006d00610067006501000001d1000001cf0000000000000000fb0000000c00430061006d00650072006100000003a5000000160000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b20000000000000000000000020000073d000001b3fc0100000006fb0000000c00430061006d00650072006101000000000000052d0000000000000000fb0000000c00430061006d00650072006101000000000000052e0000006900fffffffc00000534000002090000015600fffffffa000000010200000002fb000000100044006900730070006c006100790073010000003d0000011f000000c900fffffffb0000000a005600690065007700730100000000ffffffff000000a400fffffffb0000000c00430061006d00650072006101000000000000057c0000000000000000fb0000000a0049006d0061006700650100000582000001bb0000000000000000fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073d00000050fc0100000002fc000000000000073d000002eb00fffffffa000000020200000003fb0000000c00430061006d0065007200610000000000ffffffff0000000000000000fb0000000c00430061006d0065007200610000000000ffffffff0000000000000000fb0000000800540069006d006501000003a60000003e0000003900fffffffb0000000800540069006d006501000000000000045000000000000000000000053e0000019800000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
-  T&ime:
+  Time:
     collapsed: false
-  Width: 1680
-  X: 0
-  Y: 30
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1853
+  X: 67
+  Y: 27
