@@ -208,7 +208,6 @@ class MonoRosBridge(object):
 #            self.vehicle.sensor_data_ready.wait()
 
             # handle time
-            vehicle_transform = self.vehicle.get_transform()
             game_time = rospy.Time.now()
             if game_time is not None:
                 self.cur_time = game_time # rospy.Time.from_sec(game_time * 1e-3)
@@ -219,7 +218,7 @@ class MonoRosBridge(object):
 
             # handle agents
             self.player_handler.process_msg(
-                vehicle_transform, cur_time=self.cur_time)
+                self.vehicle, cur_time=self.cur_time)
 
             rospy.loginfo("processing data")
             for sensor in self.vehicle.sensors:

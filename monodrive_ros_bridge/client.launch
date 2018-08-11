@@ -5,7 +5,8 @@
   <param name="curr_episode" type="string" value="" />
   <node pkg="monodrive_ros_bridge" name="monodrive_ros_bridge" type="client.py" output="screen"/>
 
-  <include file="$(find velodyne_pointcloud)/launch/VLP-32C_points.launch">
-    <arg name="frame_id" default="ego" />
+  <include file="$(find velodyne_pointcloud)/launch/32e_points.launch">
+    <arg name="frame_id" default="Lidar0" />
+    <arg name="calibration" value="$(find monodrive_ros_bridge)/config/monodrive_calibration_32e.yaml"/>
   </include>
 </launch>
