@@ -21,8 +21,9 @@ from geometry_msgs.msg import TransformStamped
 from std_msgs.msg import Header
 from visualization_msgs.msg import MarkerArray, Marker
 
-from monodrive.transform import Transform as mono_Transform
+from monodrive.transform import Transform as mono_Transform, Translation as mono_Translation, Rotation as mono_Rotation
 from monodrive_ros_bridge.transforms import mono_transform_to_ros_transform, ros_transform_to_pose
+import numpy as np
 import tf
 
 class AgentObjectHandler(object):
@@ -70,53 +71,48 @@ class PlayerAgentHandler(AgentObjectHandler):
     def __init__(self, name, **kwargs):
         super(PlayerAgentHandler, self).__init__(name, **kwargs)
 
-    def process_msg(self, data, cur_time):
+    def get_transform(self, vehicle):
+        position = vehicle.gps_sensor.world_location
+        forward = vehicle.gps_sensor.forward_vector
+        if forward is not None:
+            rotation = self.calculate_rotation(forward)
+        else:
+            rotation = None
+
+        if position is not None and rotation is not None:
+            transform = mono_Transform(mono_Translation(position[0], position[1], position[2]),
+                                  rotation)
+            x, y, z = tf.transformations.translation_from_matrix(transform.matrix)
+            return transform
+        elif position:
+            return mono_Transform(mono_Translation(position[0], position[1], position[2]))
+        elif rotation:
+            return mono_Transform(rotation)
+
+        return None
+
+
+    def calculate_rotation(selfs, forward):
+        roll, pitch, yaw = tf.transformations.euler_from_quaternion(np.append(forward, [0.0]))
+        return mono_Rotation(0, yaw, 0)
+
+    def process_msg(self, vehicle, cur_time):
         t = TransformStamped()
         t.header.stamp = cur_time
         t.header.frame_id = self.world_frame
         t.child_frame_id = self.name
 
+        data = self.get_transform(vehicle)
         if data is None:
             return
 
-        x, y, z = tf.transformations.translation_from_matrix(data.matrix)
-        # print("transform xyz", x, y, z)
-
         t.transform = mono_transform_to_ros_transform(data)
-        # print("tf t", t.transform.translation)
-        # print("tf r", t.transform.rotation)
         header = Header()
         header.stamp = cur_time
         header.frame_id = self.name
         marker = get_vehicle_marker(
             data, header=header, marker_id=0, is_player=True)
         self.process_msg_fun(self.name, marker)
-        self.process_msg_fun('tf', t)
-
-        header = Header()
-        header.stamp = cur_time
-        header.frame_id = self.name + '_front'
-        marker = get_vehicle_marker(
-            data, header=header, marker_id=1, is_player=True)
-        marker.color.r = 1
-        marker.color.g = 0
-        marker.color.b = 0
-        self.process_msg_fun(self.name + '_front', marker)
-
-        t = TransformStamped()
-        t.header.stamp = cur_time
-        t.header.frame_id = self.name
-        t.child_frame_id = self.name + '_front'
-
-        from geometry_msgs.msg import Transform
-        t.transform = Transform()
-
-        quat = tf.transformations.quaternion_from_euler(0, 0, 0)
-        t.transform.rotation.x = quat[0]
-        t.transform.rotation.y = quat[1]
-        t.transform.rotation.z = quat[2]
-        t.transform.rotation.w = quat[3]
-        t.transform.translation.x = 2
         self.process_msg_fun('tf', t)
 
 
@@ -191,11 +187,12 @@ def update_marker_pose(object, base_marker):
         mono_Transform(object))
     base_marker.pose = ros_transform_to_pose(ros_transform)
 
-    base_marker.pose.position.z += 1.25
 
-    base_marker.scale.x = 9.66
-    base_marker.scale.y = 4.09
-    base_marker.scale.z = 2.51
+    base_marker.scale.x = 4.83
+    base_marker.scale.y = 2.05
+    base_marker.scale.z = 1.25
+
+    base_marker.pose.position.z += base_marker.scale.z / 2.0
 
     #print("base_marker t", base_marker.pose.position)
     #print("base_marker r", base_marker.pose.orientation)

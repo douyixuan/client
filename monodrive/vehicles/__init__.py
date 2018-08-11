@@ -12,10 +12,6 @@ from monodrive import SensorManager
 from monodrive.networking import messaging
 
 from monodrive.sensors import GPS, Waypoint
-from monodrive.transform import Rotation, Transform, Translation
-
-import tf
-import numpy as np
 
 
 class BaseVehicle(object):
@@ -110,31 +106,6 @@ class BaseVehicle(object):
                 return sensor
         return None
 
-    def get_transform(self):
-        position = self.gps_sensor.world_location
-        forward = self.gps_sensor.forward_vector
-        if forward is not None:
-            rotation = self.calculate_rotation(forward)
-        else:
-            rotation = None
-        print("position", position)
-        print("rotation", rotation)
-        if position is not None and rotation is not None:
-            transform = Transform(Translation(position[0], position[1], position[2]),
-                                  rotation)
-            x, y, z = tf.transformations.translation_from_matrix(transform.matrix)
-            print("transform xyz", x, y, z)
-            return transform
-        elif position:
-            return Transform(Translation(position[0], position[1], position[2]))
-        elif rotation:
-            return Transform(rotation)
-
-        return None
-
-    def calculate_rotation(selfs, forward):
-        roll, pitch, yaw = tf.transformations.euler_from_quaternion(np.append(forward, [0.0]))
-        return Rotation(pitch, yaw, roll)
 
 class VehicleState:
     def __init__(self):
