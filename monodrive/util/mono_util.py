@@ -7,13 +7,13 @@ from __future__ import print_function
 import numpy as np
 import cv2
 import os
+import threading, sys, traceback
 
 
 class Object3d(object):
     ''' 3d object label '''
 
     def __init__(self, h, w, l, x, y, z, ry):
-        print("Object3D(" + str(h) + ", " + str(w) + ", " + str(l) + ", " + str(x) + ", " + str(y) + ", " + str(z) + ", " + str(ry)+ ")")
         self.h = h
         self.w = w
         self.l = l
@@ -308,7 +308,7 @@ def compute_box_3d(obj, P):
 
     # project the 3d bounding box into the image plane
     corners_2d = project_to_image(np.transpose(corners_3d), P);
-    print('corners_2d: ', corners_2d)
+    #print('corners_2d: ', corners_2d)
     return corners_2d, np.transpose(corners_3d)
 
 
@@ -366,3 +366,22 @@ def draw_projected_box3d(image, qs, color=(255, 255, 255), thickness=2):
         i, j = k, k + 4
         cv2.line(image, (qs[i, 0], qs[i, 1]), (qs[j, 0], qs[j, 1]), color, thickness, cv2.LINE_AA)
     return image
+
+def print_all_stacktraces():
+    print("\n*** STACKTRACE - START ***\n")
+    code = []
+    for threadId, stack in sys._current_frames().items():
+        threadName = ''
+        for t in threading.enumerate():
+            if t.ident == threadId:
+                threadName = t.name
+        code.append("\n# ThreadID: %s %s" % (threadId, threadName))
+        for filename, lineno, name, line in traceback.extract_stack(stack):
+            code.append('File: "%s", line %d, in %s' % (filename,
+                                                        lineno, name))
+            if line:
+                code.append("  %s" % (line.strip()))
+
+    for line in code:
+        print(line)
+    print("\n*** STACKTRACE - END ***\n") 

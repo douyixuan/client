@@ -1,4 +1,6 @@
-![monoDrive](https://github.com/monoDriveIO/PythonClient/blob/master/WikiPhotos/monoDriveLogo.png "monoDrive")
+![monoDrive](https://github.com/monoDriveIO/Client/blob/master/WikiPhotos/monoDriveLogo.png "monoDrive")
+
+for full documentation visit: https://monodrive.readthedocs.io/en/latest/
 
 # monoDrive client installation
 
@@ -9,6 +11,7 @@
 - `virtualenv venv`
 - `venv\Scripts\activate`
 - `pip install -e . --upgrade`
+- `pip install -r requirements.txt`
 - `python -c "import monodrive; print('Success')"`
 - `python examples\test.py`
 
@@ -38,6 +41,7 @@
             - `virtualenv venv`
             - `venv\Scripts\activate`
             - `pip install -e . --upgrade`
+            - `pip install -r requirements.txt`
             - `python -c "import monodrive; print('Success')"`
             - `python examples\test.py`
 

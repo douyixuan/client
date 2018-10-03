@@ -7,21 +7,22 @@ __version__ = "1.0"
 import matplotlib
 import numpy as np
 import struct
-import matplotlib.patches as patches
 
-from . import BaseSensorPacketized
-from .gui import MatplotlibSensorUI
-from monodrive.transform import Rotation, Transform, Translation
-
-matplotlib.use('TkAgg')
+from . import BaseSensor
 
 SHOW_MAP = True
 
+def create_point(distance, degrees):
+    theta = np.radians(degrees)
+    c, s = np.cos(theta), np.sin(theta)
+    x = -distance * s
+    y = distance * c
+    return np.array([x, y])
 
-class BoundingBox(MatplotlibSensorUI, BaseSensorPacketized):
+
+class BoundingBox(BaseSensor):
     def __init__(self, idx, config, simulator_config, **kwargs):
         super(BoundingBox, self).__init__(idx=idx, config=config, simulator_config=simulator_config, **kwargs)
-        #self.plot = None
         self.patches = []
         self.distances = None
         self.angles = None
@@ -38,7 +39,6 @@ class BoundingBox(MatplotlibSensorUI, BaseSensorPacketized):
 
     @classmethod
     def parse_frame(cls, frame, time_stamp, game_time):
-        # frame = frame[0]
         fmt = '=hi'
         cur_frame_start = 0
         cur_frame_end = 6
@@ -118,57 +118,3 @@ class BoundingBox(MatplotlibSensorUI, BaseSensorPacketized):
             'in_camera_los': in_line_of_sight
         }
         return data_dict
-
-    def initialize_views(self):
-        self.view_lock.acquire()
-        super(BoundingBox, self).initialize_views()
-        self.map_subplot = self.main_plot.add_subplot(111)
-#        self.display(x_points, y_points, x_bounds, y_bounds, box_rotations)
-        self.map_subplot.set_xlim(-250, 250)
-        self.map_subplot.set_ylim(-250, 250)
-        self.map_subplot.set_title("Bounding Box")
-        self.map_subplot.set_xlabel('Range X (m)')
-        self.map_subplot.set_ylabel('Range Y (m)')
-        self.map_subplot.add_patch(patches.Rectangle((-1.0, -2.0), 2.0, 4.0, color='r'))
-        self.view_lock.release()
-
-    def display(self, x_points, y_points, x_bounds, y_bounds, box_rotations):
-        for patch in self.patches:
-            patch.remove()
-        self.patches = []
-
-        if len(x_points) == 0:
-            #plt.pause(.001)
-            return
-
-        for i in range(0, len(x_points)):
-            p = self.map_subplot.add_patch(patches.Rectangle((x_points[i], y_points[i]), x_bounds[i], y_bounds[i], fill=False, angle=box_rotations[i]))     # remove background
-            self.patches.append(p)
-        #plt.pause(.001)
-
-    def update_views(self, frame):
-        if SHOW_MAP:
-            self.view_lock.acquire()
-            self.display(self.x_points, self.y_points, self.x_bounds, self.y_bounds, self.box_rotations)
-            self.view_lock.release()
-            return self.map_subplot
-        return None
-
-    def process_display_data(self):
-        data = self.q_display.get()
-        self.view_lock.acquire()
-        self.x_points = data['x_points']
-        self.y_points = data['y_points']
-        self.x_bounds = data['x_bounds']
-        self.y_bounds = data['y_bounds']
-        self.box_rotations = data['box_rotations']
-        self.view_lock.release()
-        self.update_sensors_got_data_count()
-
-
-def create_point(distance, degrees):
-    theta = np.radians(degrees)
-    c, s = np.cos(theta), np.sin(theta)
-    x = -distance * s
-    y = distance * c
-    return np.array([x, y])

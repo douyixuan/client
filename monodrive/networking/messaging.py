@@ -11,6 +11,7 @@ __version__ = "1.0"
 
 import json
 import struct
+import sys
 import umsgpack
 
 from monodrive.constants import *
@@ -63,7 +64,12 @@ class Message(object):
         length = data[1]
 
         if magic == RESPONSE_HEADER and length > 8:
-            data = umsgpack.unpack(rfile)
+            if sys.version_info[0] == 3:
+                data = umsgpack.unpack(rfile)
+            else:
+                packed = rfile.read(length - 8)
+                data = umsgpack.unpackb(packed)
+
             self.message_class = data['class']
             self.status = data['status']
             self.messages = data['messages']
@@ -160,3 +166,27 @@ class ScenarioInitCommand(Message):
     def __init__(self, init):
         super(ScenarioInitCommand, self).__init__(
             SCENARIO_INIT_COMMAND_UID, init)
+
+
+class MapCommand(Message):
+    """ Send a command to request the Map. """
+
+    def __init__(self, config):
+        super(MapCommand, self).__init__(
+            MAP_COMMAND_UID, config)
+
+
+class SpawnCommand(Message):
+    """ Send a command to spawn an object in the world. """
+
+    def __init__(self, config):
+        super(SpawnCommand, self).__init__(
+            SPAWN_COMMAND_UID, config)
+
+
+class MoveActorCommand(Message):
+    """ Send a command to move an object in the world. """
+
+    def __init__(self, config):
+        super(MoveActorCommand, self).__init__(
+            MOVE_ACTOR_COMMAND_UID, config)
