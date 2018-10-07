@@ -72,8 +72,8 @@ class PlayerAgentHandler(AgentObjectHandler):
         super(PlayerAgentHandler, self).__init__(name, **kwargs)
 
     def get_transform(self, vehicle):
-        position = vehicle.gps_sensor.world_location
-        forward = vehicle.gps_sensor.forward_vector
+        position = vehicle.gps_sensor.world_location if vehicle.gps_sensor else None
+        forward = vehicle.gps_sensor.forward_vector if vehicle.gps_sensor else None
         if forward is not None:
             rotation = self.calculate_rotation(forward)
         else:

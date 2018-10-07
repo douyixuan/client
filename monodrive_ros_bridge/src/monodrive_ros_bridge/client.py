@@ -16,7 +16,6 @@ __version__ = "1.0"
 """
 Ros Bridge node for mono simulator
 """
-
 import rospy
 import sys
 import json

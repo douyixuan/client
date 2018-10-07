@@ -28,9 +28,8 @@ except ImportError:
 
 
 class TeleportVehicle(BaseVehicle):
-    def __init__(self, simulator_config, vehicle_config, restart_event=None, road_map = None,**kwargs):
-        super(TeleportVehicle, self).__init__(simulator_config, vehicle_config, restart_event)
-        self.road_map = road_map
+    def __init__(self, simulator_config, vehicle_config, road_map = None, restart_event=None,**kwargs):
+        super(TeleportVehicle, self).__init__(simulator_config, vehicle_config, road_map, restart_event)
         self.throttle = 0.0
         self.steer = 0.0
 

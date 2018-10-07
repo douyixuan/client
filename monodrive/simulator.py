@@ -53,7 +53,7 @@ class Simulator(object):
             logging.getLogger("simulator").error("failed to get map")
             return None
 
-        self.ego_vehicle = vehicle_class(self, vehicle_configuration, self.restart_event, self.map_data)
+        self.ego_vehicle = vehicle_class(self, vehicle_configuration, self.map_data, self.restart_event)
         return self.ego_vehicle
 
     def stop(self):

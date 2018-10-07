@@ -4,9 +4,10 @@ __copyright__ = "Copyright (C) 2018 monoDrive"
 __license__ = "MIT"
 __version__ = "1.0"
 
-import matplotlib
 import numpy as np
 import struct
+
+from monodrive.transform import Rotation, Transform, Translation
 
 from . import BaseSensor
 

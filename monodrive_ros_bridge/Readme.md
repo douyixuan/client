@@ -72,12 +72,18 @@ Run the following commands on your machine:
     ln -s ~/velodyne/ ~/ros/catkin_ws_for_monodrive/src/
     catkin_make
 
+### Add the monodrive module to your python path
+
+Run the following command after replacing [PATH_TO_MONODRIVE_CLIENT] with the actual path to monodrive directory on your machine
+
+    export PYTHONPATH=$PYTHONPATH:[PATH_TO_MONODRIVE_CLIENT]
+
 ### Test your installation
 
 Run the tests
 
     rostest monodrive_ros_bridge ros_bridge_client.test
-    
+
 you should see:
 
     [monodrive_ros_bridge.rosunit-testTopics/test_publish][passed]

@@ -17,21 +17,15 @@ __version__ = "1.0"
 Classes to handle mono sensors
 """
 import math
-import numpy as np
+import pickle
 import tf
 
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Point, TransformStamped
 from sensor_msgs.msg import CameraInfo, Imu, NavSatFix
-from sensor_msgs.point_cloud2 import create_cloud_xyz32
 from std_msgs.msg import Header
 
-from velodyne_msgs.msg import VelodynePacket
-
-from monodrive.sensors.camera import Camera
-from monodrive.sensors.lidar import Lidar
-from monodrive.sensors import BaseSensor as Sensor
-from monodrive.transform import Transform
+from velodyne_msgs.msg import VelodynePacket, VelodyneScan
 
 from monodrive_ros_bridge.transforms import mono_transform_to_ros_transform
 from monodrive_ros_bridge.msg import BoundingBox, LaneInfo, Rpm, Target, Waypoint
@@ -105,12 +99,25 @@ class LidarHandler(SensorHandler):
     def __init__(self, name, sensor, **kwargs):
         super(LidarHandler, self).__init__(
             name, sensor=sensor, **kwargs)
+        self.scan = None
 
     def _compute_sensor_msg(self, sensor_data, cur_time):
         topic = 'velodyne_packets'
+        if self.scan is None:
+            self.scan = []
+
         for lidar_packet in sensor_data:
             new_sensor_data = bytes(lidar_packet)
-            self.process_msg_fun(topic, VelodynePacket(stamp=cur_time, data=new_sensor_data))
+            self.scan.append(VelodynePacket(stamp=cur_time, data=new_sensor_data))
+
+        if len(self.scan) == 75:
+            header = Header()
+            header.stamp = cur_time
+            header.frame_id = self.frame_id
+
+            self.process_msg_fun(topic, VelodyneScan(header=header, packets=self.scan))
+            self.scan = []
+            #self.process_msg_fun(topic, VelodynePacket(stamp=cur_time, data=new_sensor_data))
 
     def _compute_transform(self, sensor_data, cur_time):
 
@@ -183,7 +190,7 @@ class CameraHandler(SensorHandler):
     def _compute_sensor_msg(self, sensor_data, cur_time):
         encoding = 'bgra8'
 
-        data = np.array(bytearray(sensor_data['image']), dtype=np.uint8).reshape(self.sensor.height, self.sensor.width, 4)
+        data = pickle.loads(sensor_data)#np.array(bytearray(sensor_data), dtype=np.uint8).reshape(self.sensor.height, self.sensor.width, 4)
 
         img_msg = cv_bridge.cv2_to_imgmsg(data, encoding=encoding)
         img_msg.header.frame_id = self.frame_id
@@ -441,7 +448,7 @@ class WaypointHandler(SensorHandler):
         header.stamp = cur_time
         header.frame_id = self.frame_id
 
-        msg = Waypoint(current_lane=sensor_data['lane_number'], lanes=[])
+        msg = Waypoint(header=header, current_lane=sensor_data['lane_number'], lanes=[])
         for i in range(0, len(sensor_data['points_by_lane'])):
             lane = LaneInfo(lane_id=i, speed_limit=sensor_data['speed_limit_by_lane'][i], points=[])
             for x, y in sensor_data['points_by_lane'][i]:

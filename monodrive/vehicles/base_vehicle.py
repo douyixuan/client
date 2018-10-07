@@ -20,8 +20,9 @@ import multiprocessing
 
 
 class BaseVehicle(object):
-    def __init__(self, simulator, vehicle_config, restart_event=None, **kwargs):
+    def __init__(self, simulator, vehicle_config, road_map=None, restart_event=None, **kwargs):
         super(BaseVehicle, self).__init__()
+        self.road_map = road_map
         self.simulator = simulator
         self.simulator_config = simulator.configuration
         self.name = vehicle_config.id
