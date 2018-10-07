@@ -85,7 +85,7 @@
       "id": "0",
       "packet_size": 1472,
       "listen_port": 8080,
-      "display_process": false,
+      "display_process": true,
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
@@ -100,7 +100,7 @@
       },
       "max_distance": 50000.0,
       "horizontal_fov_angle": 50.0,
-      "fps": 2,
+      "fps": 2.0,
       "stream_dimensions": {
         "x":512.0,
         "y":512.0
@@ -113,7 +113,7 @@
       "id": "0",
       "packet_size": 1472,
       "listen_port": 8081,
-      "display_process": false,
+      "display_process": true,
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
@@ -133,7 +133,7 @@
       "id": "0",
       "packet_size": 1472,
       "listen_port": 8082,
-      "display_process": false,
+      "display_process": true,
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
@@ -155,7 +155,7 @@
       "id": "0",
       "packet_size": 1472,
       "listen_port": 8083,
-      "display_process": false,
+      "display_process": true,
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
@@ -175,7 +175,7 @@
       "id": "0",
       "packet_size": 1472,
       "listen_port": 8084,
-      "display_process": false,
+      "display_process": true,
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
