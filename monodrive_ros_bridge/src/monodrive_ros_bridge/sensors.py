@@ -17,7 +17,7 @@ __version__ = "1.0"
 Classes to handle mono sensors
 """
 import math
-import pickle
+import numpy as np
 import tf
 
 from cv_bridge import CvBridge
@@ -190,7 +190,8 @@ class CameraHandler(SensorHandler):
     def _compute_sensor_msg(self, sensor_data, cur_time):
         encoding = 'bgra8'
 
-        data = pickle.loads(sensor_data)#np.array(bytearray(sensor_data), dtype=np.uint8).reshape(self.sensor.height, self.sensor.width, 4)
+        #data = pickle.loads(sensor_data)
+        data = np.array(bytearray(sensor_data['image']), dtype=np.uint8).reshape(self.sensor.height, self.sensor.width, 4)
 
         img_msg = cv_bridge.cv2_to_imgmsg(data, encoding=encoding)
         img_msg.header.frame_id = self.frame_id

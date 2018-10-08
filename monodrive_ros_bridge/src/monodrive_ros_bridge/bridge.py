@@ -13,9 +13,7 @@ Rosbridge class:
 
 Class that handle communication between mono and ROS
 """
-import random, time
 from itertools import count
-from multiprocessing import Event
 
 from rosgraph_msgs.msg import Clock
 from tf2_msgs.msg import TFMessage
@@ -23,55 +21,13 @@ import rospy
 
 
 from monodrive import Simulator, SimulatorConfiguration, VehicleConfiguration
-#from mono.settings import monoSettings
-#from monodrive_ros_bridge.control import InputController
 from monodrive_ros_bridge.markers import PlayerAgentHandler, NonPlayerAgentsHandler
 from monodrive_ros_bridge.sensors import BoundingBoxHandler, CameraHandler, \
     GpsHandler, LidarHandler, ImuHandler, RpmHandler, WaypointHandler
 from monodrive_ros_bridge.world import WorldMapHandler
 
-from monodrive.vehicles import SimpleVehicle
+from .ros_vehicle import RosVehicle
 
-
-class RosVehicle(SimpleVehicle):
-    def __init__(self, simulator, vehicle_config, map_data=None, restart_event=None, **kwargs):
-        super(RosVehicle, self).__init__(simulator, vehicle_config, map_data, restart_event)
-        self.running = False
-        self.episode_event = Event()
-
-    def start(self):
-        rospy.loginfo("--> starting vehicle process")
-        #self.running = True
-        #super(RosVehicle, self).start()
-        [p.start() for p in self.get_process_list()]
-
-        rospy.loginfo("start streaming sensors")
-        for sensor in self.sensors:
-            res = sensor.send_start_stream_command(self.simulator)
-            rospy.loginfo(res)
-#        [s.send_start_stream_command(self.simulator) for s in self.sensors]
-
-        rospy.loginfo("waiting for sensors ready")
-        [s.wait_until_ready() for s in self.sensors]
-
-        rospy.loginfo("starting vehicle loop")
-        # Kicks off simulator for stepping
-        self.init_vehicle_loop()
-
-        rospy.loginfo("<-- vehicle process started")
-
-#    def run(self):
-#        rospy.loginfo("running vehicle process")
-#        while self.running:
-#            self.episode_event.wait()
-
-    def stop(self):
-        rospy.loginfo("stopping vehicle process")
-        self.running = False
-        super(RosVehicle, self).stop()
-
-    def end_episode(self):
-        self.episode_event.set()
 
 
 class MonoRosBridge(object):
@@ -251,7 +207,7 @@ class MonoRosBridge(object):
                         if s.name == sensor.sensor_id:
                             processor = s
 
-                        data = sensor.get_message(block=True, timeout=2.0)
+                        data = sensor.get_display_message(block=True, timeout=2.0)
                         if data:
                             rospy.loginfo("got data from {0}{1}".format(sensor.type, sensor.sensor_id))
                             processor.process_sensor_data(data, self.cur_time)
