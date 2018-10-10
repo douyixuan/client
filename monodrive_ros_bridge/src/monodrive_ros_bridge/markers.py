@@ -18,6 +18,7 @@ Classes to handle Agent object (player and non-player)
 """
 
 from geometry_msgs.msg import TransformStamped
+import rospy
 from std_msgs.msg import Header
 from visualization_msgs.msg import MarkerArray, Marker
 

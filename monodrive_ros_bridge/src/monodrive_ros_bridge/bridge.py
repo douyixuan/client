@@ -75,7 +75,7 @@ class MonoRosBridge(object):
         #    "vehicles", process_msg_fun=self.process_msg)
 
         # creating handler for sensors
-        self.sensors = {}
+        self.sensor_handlers = {}
         for t, sensors in self.param_sensors.items():
             for id in sensors:
                 self.add_sensor(sensors[id])
@@ -104,10 +104,10 @@ class MonoRosBridge(object):
             sensor_handler = WaypointHandler
 
         if sensor_handler:
-            if self.sensors.get(sensor_type, None) is None:
-                self.sensors[sensor_type] = []
+            if self.sensor_handlers.get(sensor_type, None) is None:
+                self.sensor_handlers[sensor_type] = []
 
-            self.sensors[sensor_type].append(sensor_handler(
+            self.sensor_handlers[sensor_type].append(sensor_handler(
                 id,
                 self.vehicle.get_sensor(sensor_type, id),
                 process_msg_fun=self.process_msg))
@@ -153,9 +153,10 @@ class MonoRosBridge(object):
             publisher.publish(msg)
         self.msgs_to_publish = []
 
-        tf_msg = TFMessage(self.tf_to_publish)
-        self.publishers['tf'].publish(tf_msg)
-        self.tf_to_publish = []
+        if len(self.tf_to_publish):
+            tf_msg = TFMessage(self.tf_to_publish)
+            self.publishers['tf'].publish(tf_msg)
+            self.tf_to_publish = []
 
     def compute_cur_time_msg(self):
         self.process_msg('clock', Clock(self.cur_time))
@@ -180,14 +181,31 @@ class MonoRosBridge(object):
         for frame in count():
             if (frame == self.frames_per_episode) or rospy.is_shutdown():
                 rospy.loginfo("----- end episode -----")
+                rospy.loginfo("{0},{1},{2}".format(frame, self.frames_per_episode, rospy.is_shutdown()))
                 break
 
             # handle time
             game_time = rospy.Time.now()
             if game_time is not None:
-                self.cur_time = game_time # rospy.Time.from_sec(game_time * 1e-3)
+                self.cur_time = game_time
                 self.compute_cur_time_msg()
-                print("gametime:", game_time, "curtime:", self.cur_time)
+
+#            self.vehicle.
+            rospy.loginfo("process sensor data")
+            for sensor in self.vehicle.sensors:
+                handlers = self.sensor_handlers.get(sensor.type, None)
+                if handlers:
+                    sensor_handler = None
+                    for handler in handlers:
+                        if handler.name == sensor.sensor_id:
+                            sensor_handler = handler
+                            break
+
+                    if sensor_handler:
+                        rospy.loginfo("processing {0}{1}".format(sensor.type,sensor_handler.name))
+                        sensor_handler.process_sensor_data(self.cur_time)
+                    else:
+                        rospy.loginfo("no handler found for {0}".format(sensor.type))
 
             rospy.loginfo('process world_handler')
             self.world_handler.process_msg(self.cur_time)
@@ -197,79 +215,10 @@ class MonoRosBridge(object):
             self.player_handler.process_msg(
                 self.vehicle, cur_time=self.cur_time)
 
-            rospy.loginfo("process sensor data")
-            hasData = False
-            for sensor in self.vehicle.sensors:
-                if self.sensors.get(sensor.type, None):
-                    processor = None
-                    sensors = self.sensors[sensor.type]
-                    for s in sensors:
-                        if s.name == sensor.sensor_id:
-                            processor = s
-
-                        data = sensor.get_display_message(block=True, timeout=2.0)
-                        if data:
-                            rospy.loginfo("got data from {0}{1}".format(sensor.type, sensor.sensor_id))
-                            processor.process_sensor_data(data, self.cur_time)
-                            hasData = True
-
-#                     try:
-#                         data = sensor.get_message(block=True, timeout=2.0)
-#                         if data:
-#                             rospy.loginfo("got data from {0}{1}".format(sensor.type, sensor.sensor_id))
-#                             processor.process_sensor_data(data, self.cur_time)
-#                             hasData = True
-# #                        else:
-# #                            rospy.loginfo('-----    skipping {}'.format(sensor.name))
-#                     except Exception as e:
-#                         rospy.loginfo(e)
-#                         raise e
-                        # while not sensor.q_data.empty():
-                        #     data = sensor.q_data.get()
-                        #     processor.process_sensor_data(data, self.cur_time)
-
-            if hasData:
-#                rospy.loginfo("publishing messages")
-                # publish all messages
-                self.send_msgs()
-
-            #self.vehicle.all_sensors_ready.clear()
-            #control_data = self.vehicle.drive(self.vehicle.sensors)
-            #rospy.loginfo("--> {0}".format(control_data))
-            #self.vehicle.send_control_data(control_data)
-
-            #rospy.loginfo("waiting for data")
-            #self.vehicle.all_sensors_ready.wait()
-
-            '''
-            measurements, sensor_data = self.client.read_data()
-
-            # handle time
-            self.mono_game_stamp = measurements.game_timestamp
-            self.cur_time = rospy.Time.from_sec(self.mono_game_stamp * 1e-3)
-            self.compute_cur_time_msg()
-
-            # handle agents
-            self.player_handler.process_msg(
-                measurements.player_measurements, cur_time=self.cur_time)
-            self.non_players_handler.process_msg(
-                measurements.non_player_agents, cur_time=self.cur_time)
-
-            # handle sensors
-            for name, data in sensor_data.items():
-                self.sensors[name].process_sensor_data(data, self.cur_time)
-
             # publish all messages
             self.send_msgs()
 
-            # handle control
-            if rospy.get_param('mono_autopilot', True):
-                control = measurements.player_measurements.autopilot_control
-                self.client.send_control(control)
-            else:
-                control = self.input_controller.cur_control
-                self.client.send_control(**control)
-            '''
+            self.vehicle.step_episode()
 
         # Waits for the restart event to be set in the control process
         rospy.loginfo('Episode loop ended')

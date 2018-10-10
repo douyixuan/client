@@ -19,6 +19,7 @@ Classes to handle mono sensors
 import math
 import numpy as np
 import tf
+import rospy
 
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Point, TransformStamped
@@ -60,7 +61,7 @@ class SensorHandler(object):
         self.parent_frame_id = "ego"
         self.frame_id = self.sensor.type + name
 
-    def process_sensor_data(self, data, cur_time):
+    def process_sensor_data(self, cur_time):
         """
         process a mono sensor data object
 
@@ -70,8 +71,13 @@ class SensorHandler(object):
         :param cur_time: current monodrive_ros_bridge simulation time
         :return:
         """
-        self._compute_sensor_msg(data, cur_time)
-        self._compute_transform(data, cur_time)
+        try:
+            data = self.sensor.get_display_message(block=True, timeout=1.0)
+            if data:
+                self._compute_sensor_msg(data, cur_time)
+                self._compute_transform(data, cur_time)
+        except:
+            pass
 
     def _compute_sensor_msg(self, data, cur_time):
         """
@@ -99,25 +105,21 @@ class LidarHandler(SensorHandler):
     def __init__(self, name, sensor, **kwargs):
         super(LidarHandler, self).__init__(
             name, sensor=sensor, **kwargs)
-        self.scan = None
 
     def _compute_sensor_msg(self, sensor_data, cur_time):
         topic = 'velodyne_packets'
-        if self.scan is None:
-            self.scan = []
 
+        scan = []
         for lidar_packet in sensor_data:
             new_sensor_data = bytes(lidar_packet)
-            self.scan.append(VelodynePacket(stamp=cur_time, data=new_sensor_data))
+            scan.append(VelodynePacket(stamp=cur_time, data=new_sensor_data))
 
-        if len(self.scan) == 75:
+        if len(scan):
             header = Header()
             header.stamp = cur_time
             header.frame_id = self.frame_id
 
-            self.process_msg_fun(topic, VelodyneScan(header=header, packets=self.scan))
-            self.scan = []
-            #self.process_msg_fun(topic, VelodynePacket(stamp=cur_time, data=new_sensor_data))
+            self.process_msg_fun(topic, VelodyneScan(header=header, packets=scan))
 
     def _compute_transform(self, sensor_data, cur_time):
 
