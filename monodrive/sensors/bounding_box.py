@@ -38,8 +38,7 @@ class BoundingBox(BaseSensor):
         return Transform(Translation(0, 0, 0.75),
                          Rotation(0, 90, 0))
 
-    @classmethod
-    def parse_frame(cls, frame, time_stamp, game_time):
+    def parse_frame(self, frame, time_stamp, game_time):
         fmt = '=hi'
         cur_frame_start = 0
         cur_frame_end = 6

@@ -159,7 +159,6 @@ class Base_Radar(BaseSensor):
     def get_frame_size(self):
         return self.samples_per_sweep * 32 * 2 * self.n_rx_elements * self.nSweep / 8
 
-    #@classmethod
     def parse_frame(self, frame, time_stamp, game_time):
         radar_data = {}
         if self.process_frame(frame):

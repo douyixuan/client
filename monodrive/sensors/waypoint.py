@@ -23,8 +23,7 @@ class Waypoint(BaseSensor):
         self.previous_points = None
         self.xy_combined = np.column_stack(([0], [0]))
 
-    @classmethod
-    def parse_frame(cls, frame, time_stamp, game_time):
+    def parse_frame(self, frame, time_stamp, game_time):
         # frame = frame[0]
         fmt = '=iii'
         header_offset = 12

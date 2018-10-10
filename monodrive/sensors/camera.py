@@ -41,8 +41,7 @@ class Camera(BaseSensor):
     def get_frame_size(self):
         return self.frame_size
 
-    @classmethod
-    def parse_frame(cls, frame, time_stamp, game_time):
+    def parse_frame(self, frame, time_stamp, game_time):
         data_dict = {
             'image': frame,
             'game_time': game_time,

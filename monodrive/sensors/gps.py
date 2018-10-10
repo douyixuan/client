@@ -18,8 +18,7 @@ class GPS(BaseSensor):
         self.world_location = None
         self.speed = None
 
-    @classmethod
-    def parse_frame(cls, frame, time_stamp, game_time):
+    def parse_frame(self, frame, time_stamp, game_time):
         fmt = '=chhcdddfffffffhhcch'
         preamble, MSG_POS_LLH, sensor_id, payload_length, lat, lng, elev, loc_x, loc_y, for_x, for_y, for_z, ego_yaw, speed, \
         h_ac, v_ac, sats, status, crc = list(
@@ -38,3 +37,11 @@ class GPS(BaseSensor):
             'speed': speed
         }
         return data_dict
+
+    def get_display_message(self, block=True, timeout=None):
+        data = super(GPS, self).get_display_message(block, timeout)
+        if data:
+            self.speed = data.get('speed', None)
+            self.world_location = data.get('world_location', None)
+            self.forward_vector = data.get('forward_vector', None)
+        return data

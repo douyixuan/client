@@ -15,8 +15,7 @@ class RPM(BaseSensor):
         self.wheel_number = None
         self.wheel_rpm = None
 
-    @classmethod
-    def parse_frame(cls, frame, time_stamp, game_time):
+    def parse_frame(self, frame, time_stamp, game_time):
         wheel_number, wheel_speed = list(struct.unpack('=if', frame))
         data_dict = {
             'time_stamp': time_stamp,

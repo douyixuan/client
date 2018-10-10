@@ -18,8 +18,7 @@ class IMU(BaseSensor):
         self.angular_velocity_vector = None
         self.timer = None
 
-    @classmethod
-    def parse_frame(cls, frame, time_stamp, game_time):
+    def parse_frame(self, frame, time_stamp, game_time):
         fmt = '=ffffffih'
         accel_x, accel_y, accel_z, ang_rate_x, ang_rate_y, ang_rate_z, timer, check_sum = list(
             struct.unpack(fmt, frame[1:31]))

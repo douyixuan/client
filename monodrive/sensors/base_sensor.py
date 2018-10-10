@@ -292,6 +292,9 @@ class BaseSensor(object):
 
         return received, data
 
+    def parse_frame(self, frame, time_stamp, game_time):
+        return frame
+
     # Hook method for digest each packet, when not packetized forward on to digest_frame
     # since each packet is an entire frame. Sensors that send multiple packet for a single data frame
     # need to override this data_ready_event
@@ -303,8 +306,7 @@ class BaseSensor(object):
     def digest_frame(self, frame, time_stamp, game_time):
         self.frame_count += 1
 
-        if hasattr(self, 'parse_frame'):
-            frame = self.parse_frame(frame, time_stamp, game_time)
+        frame = self.parse_frame(frame, time_stamp, game_time)
 
         # if our queue is filled up pop the top one
         if self.q_data.full():
@@ -343,10 +345,10 @@ class BaseSensor(object):
         position = self.config.get("location", None)
         rotation = self.config.get("rotation", None)
         if position and rotation:
-            return Transform(Translation(position['x'], position['y'], position['z']),
+            return Transform(Translation(position['x'], position['y'], 0.75),
                              Rotation(rotation['pitch'], rotation['yaw'], rotation['roll']))
         elif position:
-            return Transform(Translation(position['x'], position['y'], position['z']))
+            return Transform(Translation(position['x'], position['y'], 0.75))
         elif rotation:
             return Transform(Rotation(rotation['pitch'], rotation['yaw'], rotation['roll']))
 
