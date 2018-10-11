@@ -18,6 +18,7 @@ from itertools import count
 from rosgraph_msgs.msg import Clock
 from tf2_msgs.msg import TFMessage
 import rospy
+import time
 
 
 from monodrive import Simulator, SimulatorConfiguration, VehicleConfiguration
@@ -203,7 +204,7 @@ class MonoRosBridge(object):
 
                     if sensor_handler:
                         rospy.loginfo("processing {0}{1}".format(sensor.type,sensor_handler.name))
-                        sensor_handler.process_sensor_data(self.cur_time)
+                        sensor_handler.process_sensor_data(self.vehicle, self.cur_time)
                     else:
                         rospy.loginfo("no handler found for {0}".format(sensor.type))
 

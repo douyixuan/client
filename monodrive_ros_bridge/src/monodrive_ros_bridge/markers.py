@@ -17,7 +17,7 @@ __version__ = "1.0"
 Classes to handle Agent object (player and non-player)
 """
 
-from geometry_msgs.msg import TransformStamped
+from geometry_msgs.msg import TransformStamped, Transform
 import rospy
 from std_msgs.msg import Header
 from visualization_msgs.msg import MarkerArray, Marker
@@ -108,6 +108,9 @@ class PlayerAgentHandler(AgentObjectHandler):
             return
 
         t.transform = mono_transform_to_ros_transform(data)
+        t.transform.translation.x = 0
+        t.transform.translation.y = 0
+        t.transform.translation.z = 0
         header = Header()
         header.stamp = cur_time
         header.frame_id = self.name
@@ -157,7 +160,8 @@ def get_vehicle_marker(object, header, marker_id=0, is_player=False):
     :return: a monodrive_ros_bridge marker msg
     """
     marker = Marker(header=header)
-    marker.color.a = 0.3
+    marker.action = Marker.ADD
+    marker.color.a = 0.7
     if is_player:
         marker.color.g = 1
         marker.color.r = 0
@@ -191,7 +195,7 @@ def update_marker_pose(object, base_marker):
 
     base_marker.scale.x = 4.83
     base_marker.scale.y = 2.05
-    base_marker.scale.z = 1.25
+    base_marker.scale.z = 0.75 #1.25
 
     base_marker.pose.position.z += base_marker.scale.z / 2.0
 

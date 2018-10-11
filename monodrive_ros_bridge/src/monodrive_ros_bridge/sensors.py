@@ -20,15 +20,19 @@ import math
 import numpy as np
 import tf
 import rospy
+import traceback
 
 from cv_bridge import CvBridge
 from geometry_msgs.msg import Point, TransformStamped
 from sensor_msgs.msg import CameraInfo, Imu, NavSatFix
 from std_msgs.msg import Header
+from visualization_msgs.msg import Marker
 
 from velodyne_msgs.msg import VelodynePacket, VelodyneScan
 
-from monodrive_ros_bridge.transforms import mono_transform_to_ros_transform
+
+from monodrive.transform import Transform as mono_Transform, Translation as mono_Translation, Rotation as mono_Rotation
+from monodrive_ros_bridge.transforms import mono_transform_to_ros_transform, ros_transform_to_pose
 from monodrive_ros_bridge.msg import BoundingBox, LaneInfo, Rpm, Target, Waypoint
 
 
@@ -61,7 +65,7 @@ class SensorHandler(object):
         self.parent_frame_id = "ego"
         self.frame_id = self.sensor.type + name
 
-    def process_sensor_data(self, cur_time):
+    def process_sensor_data(self, vehicle, cur_time):
         """
         process a mono sensor data object
 
@@ -75,9 +79,34 @@ class SensorHandler(object):
             data = self.sensor.get_display_message(block=True, timeout=1.0)
             if data:
                 self._compute_sensor_msg(data, cur_time)
-                self._compute_transform(data, cur_time)
-        except:
-            pass
+                self._compute_transform(data, self._get_transform(vehicle), cur_time)
+        except Exception as e:
+            traceback.print_exc()
+            rospy.loginfo(e)
+
+    def calculate_rotation(selfs, forward):
+        roll, pitch, yaw = tf.transformations.euler_from_quaternion(np.append(forward, [0.0]))
+        return mono_Rotation(0, yaw, 0)
+
+    def _get_transform(self, vehicle):
+        position = vehicle.gps_sensor.world_location if vehicle.gps_sensor else None
+        forward = vehicle.gps_sensor.forward_vector if vehicle.gps_sensor else None
+        if forward is not None:
+            rotation = self.calculate_rotation(forward)
+        else:
+            rotation = None
+
+        if position is not None and rotation is not None:
+            transform = mono_Transform(mono_Translation(position[0], position[1], position[2]),
+                                  rotation)
+            x, y, z = tf.transformations.translation_from_matrix(transform.matrix)
+            return transform
+        elif position:
+            return mono_Transform(mono_Translation(position[0], position[1], position[2]))
+        elif rotation:
+            return mono_Transform(rotation)
+
+        return None
 
     def _compute_sensor_msg(self, data, cur_time):
         """
@@ -87,7 +116,7 @@ class SensorHandler(object):
         """
         raise NotImplemented
 
-    def _compute_transform(self, data, cur_time):
+    def _compute_transform(self, data, ref, cur_time):
         """
         Compute the tf msg associated to mono data
 
@@ -121,14 +150,18 @@ class LidarHandler(SensorHandler):
 
             self.process_msg_fun(topic, VelodyneScan(header=header, packets=scan))
 
-    def _compute_transform(self, sensor_data, cur_time):
+    def _compute_transform(self, sensor_data, ref, cur_time):
+        if ref is None:
+            return
 
         t = TransformStamped()
         t.header.stamp = cur_time
         t.header.frame_id = self.parent_frame_id
         t.child_frame_id = self.frame_id
         t.transform = mono_transform_to_ros_transform(
-            self.sensor.get_transform())
+#            mono_Transform(mono_Translation(0,0,0))
+             self.sensor.get_transform()
+        )
 
         # for some reasons lidar sends already rotated cloud,
         # so it is need to ignore pitch and roll
@@ -140,8 +173,50 @@ class LidarHandler(SensorHandler):
         t.transform.rotation.y = quat[1]
         t.transform.rotation.z = quat[2]
         t.transform.rotation.w = quat[3]
+
+        # if ref:
+        #     ref = mono_transform_to_ros_transform(ref)
+        #     t.transform.translation.x = ref.translation.x + t.transform.translation.x
+        #     t.transform.translation.y = ref.translation.y + t.transform.translation.y
+        #     t.transform.translation.z = ref.translation.z + t.transform.translation.z
+        # t.transform.translation.x = 0
+        # t.transform.translation.y = 0
+        # t.transform.translation.z = 0
+        # if ref:
+        #     rospy.loginfo("lidar tf: {0}".format(t.transform))
+        #     rospy.loginfo("ego   tf: {0}".format(mono_transform_to_ros_transform(ref)))
+        self.process_msg_fun('ego', self.get_marker(t.header, self.sensor.get_transform()))
         self.process_msg_fun('tf', t)
 
+    def get_marker(self, header, object):
+        marker = Marker(header=header)
+        marker.id = 700
+        marker.text = "id = {}".format(marker.id)
+        marker.action = Marker.ADD
+        marker.color.a = 0.9
+        marker.color.g = 0.5
+        marker.color.r = 0
+        marker.color.b = 1
+        ros_transform = mono_transform_to_ros_transform(
+            # mono_Transform(object.bounding_box.transform) *
+            object)
+        marker.pose = ros_transform_to_pose(ros_transform)
+
+        marker.scale.x = 1.5
+        marker.scale.y = 1.5
+        marker.scale.z = 1.0  # 1.25
+
+#        marker.pose.position.z += marker.scale.z / 2.0
+
+        # print("base_marker t", base_marker.pose.position)
+        # print("base_marker r", base_marker.pose.orientation)
+
+        # base_marker.scale.x = object.bounding_box.extent.x * 2.0
+        # base_marker.scale.y = object.bounding_box.extent.y * 2.0
+        # base_marker.scale.z = object.bounding_box.extent.z * 2.0
+
+        marker.type = Marker.ARROW
+        return marker
 
 class CameraHandler(SensorHandler):
     """
@@ -205,7 +280,7 @@ class CameraHandler(SensorHandler):
         self.process_msg_fun(self.topic_cam_info, cam_info)
         self.process_msg_fun(self.topic_image, img_msg)
 
-    def _compute_transform(self, sensor_data, cur_time):
+    def _compute_transform(self, sensor_data, ref, cur_time):
 
         t = TransformStamped()
         t.header.stamp = cur_time
@@ -269,7 +344,7 @@ class ImuHandler(SensorHandler):
         self.process_msg_fun('imu', msg)
 
 
-    def _compute_transform(self, sensor_data, cur_time):
+    def _compute_transform(self, sensor_data, ref, cur_time):
 
         t = TransformStamped()
         t.header.stamp = cur_time
@@ -322,7 +397,7 @@ class GpsHandler(SensorHandler):
         self.process_msg_fun('gps', msg)
 
 
-    def _compute_transform(self, sensor_data, cur_time):
+    def _compute_transform(self, sensor_data, ref, cur_time):
 
         t = TransformStamped()
         t.header.stamp = cur_time
@@ -367,7 +442,7 @@ class RpmHandler(SensorHandler):
         self.process_msg_fun('rpm', msg)
 
 
-    def _compute_transform(self, sensor_data, cur_time):
+    def _compute_transform(self, sensor_data, ref, cur_time):
 
         t = TransformStamped()
         t.header.stamp = cur_time
@@ -417,7 +492,7 @@ class BoundingBoxHandler(SensorHandler):
 
         self.process_msg_fun('boundingbox', msg)
 
-    def _compute_transform(self, sensor_data, cur_time):
+    def _compute_transform(self, sensor_data, ref, cur_time):
 
         t = TransformStamped()
         t.header.stamp = cur_time
@@ -461,7 +536,7 @@ class WaypointHandler(SensorHandler):
 
         self.process_msg_fun('waypoint', msg)
 
-    def _compute_transform(self, sensor_data, cur_time):
+    def _compute_transform(self, sensor_data, ref, cur_time):
 
         t = TransformStamped()
         t.header.stamp = cur_time

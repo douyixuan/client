@@ -345,10 +345,10 @@ class BaseSensor(object):
         position = self.config.get("location", None)
         rotation = self.config.get("rotation", None)
         if position and rotation:
-            return Transform(Translation(position['x'], position['y'], 0.75),
+            return Transform(Translation(position['x']/100.0, position['y']/100.0, 0.75),
                              Rotation(rotation['pitch'], rotation['yaw'], rotation['roll']))
         elif position:
-            return Transform(Translation(position['x'], position['y'], 0.75))
+            return Transform(Translation(position['x']/100.0, position['y']/100.0, 0.75))
         elif rotation:
             return Transform(Rotation(rotation['pitch'], rotation['yaw'], rotation['roll']))
 
