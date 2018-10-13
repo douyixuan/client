@@ -23,9 +23,9 @@ import rospy
 import traceback
 
 from cv_bridge import CvBridge
-from geometry_msgs.msg import Point, TransformStamped
+from geometry_msgs.msg import Point, TransformStamped, Vector3
 from sensor_msgs.msg import CameraInfo, Imu, NavSatFix
-from std_msgs.msg import Header
+from std_msgs.msg import ColorRGBA, Header
 from visualization_msgs.msg import Marker
 
 from velodyne_msgs.msg import VelodynePacket, VelodyneScan
@@ -48,6 +48,7 @@ class SensorHandler(object):
     sensor.
     These messages are passed to a *process_msg_fun* which will take care of publishing them.
     """
+    _count = 700
 
     def __init__(self,
                  name,
@@ -59,6 +60,9 @@ class SensorHandler(object):
         :param mono_settings: mono_settings object
         :param process_msg_fun: function to call on each new computed message
         """
+        self._instance_id = SensorHandler._count
+        SensorHandler._count = SensorHandler._count + 1
+
         self.process_msg_fun = process_msg_fun
         self.sensor = sensor
         self.name = name
@@ -125,6 +129,22 @@ class SensorHandler(object):
         """
         raise NotImplemented
 
+    def get_marker(self, header, transform, type, color, size):
+        marker = Marker(header=header)
+        marker.id = self._instance_id
+        marker.text = "id = {}".format(marker.id)
+        #marker.action = Marker.ADD
+        marker.color = color
+        ros_transform = mono_transform_to_ros_transform(
+            # mono_Transform(object.bounding_box.transform) *
+            transform)
+        marker.pose = ros_transform_to_pose(ros_transform)
+
+        marker.scale = size
+
+        marker.type = type
+        return marker
+
 
 class LidarHandler(SensorHandler):
     """
@@ -185,38 +205,14 @@ class LidarHandler(SensorHandler):
         # if ref:
         #     rospy.loginfo("lidar tf: {0}".format(t.transform))
         #     rospy.loginfo("ego   tf: {0}".format(mono_transform_to_ros_transform(ref)))
-        self.process_msg_fun('ego', self.get_marker(t.header, self.sensor.get_transform()))
         self.process_msg_fun('tf', t)
 
-    def get_marker(self, header, object):
-        marker = Marker(header=header)
-        marker.id = 700
-        marker.text = "id = {}".format(marker.id)
-        marker.action = Marker.ADD
-        marker.color.a = 0.9
-        marker.color.g = 0.5
-        marker.color.r = 0
-        marker.color.b = 1
-        ros_transform = mono_transform_to_ros_transform(
-            # mono_Transform(object.bounding_box.transform) *
-            object)
-        marker.pose = ros_transform_to_pose(ros_transform)
+        self.process_msg_fun('sensors', self.get_marker(t.header,
+                                                        self.sensor.get_transform(),
+                                                        Marker.ARROW,
+                                                        ColorRGBA(0.9,0.5,0,1),
+                                                        Vector3(1.5,0.2,0.2)))
 
-        marker.scale.x = 1.5
-        marker.scale.y = 1.5
-        marker.scale.z = 1.0  # 1.25
-
-#        marker.pose.position.z += marker.scale.z / 2.0
-
-        # print("base_marker t", base_marker.pose.position)
-        # print("base_marker r", base_marker.pose.orientation)
-
-        # base_marker.scale.x = object.bounding_box.extent.x * 2.0
-        # base_marker.scale.y = object.bounding_box.extent.y * 2.0
-        # base_marker.scale.z = object.bounding_box.extent.z * 2.0
-
-        marker.type = Marker.ARROW
-        return marker
 
 class CameraHandler(SensorHandler):
     """
@@ -308,6 +304,12 @@ class CameraHandler(SensorHandler):
 
         self.process_msg_fun('tf', t)
 
+        self.process_msg_fun('sensors', self.get_marker(t.header,
+                                                        self.sensor.get_transform(),
+                                                        Marker.ARROW,
+                                                        ColorRGBA(0.5,0.9,0.5,0),
+                                                        Vector3(0.5,0.1,0.1)))
+
 
 class ImuHandler(SensorHandler):
     def __init__(self, name, sensor, **kwargs):
@@ -370,6 +372,12 @@ class ImuHandler(SensorHandler):
 
         self.process_msg_fun('tf', t)
 
+        self.process_msg_fun('sensors', self.get_marker(t.header,
+                                                        self.sensor.get_transform(),
+                                                        Marker.SPHERE,
+                                                        ColorRGBA(0.5,0.9,0,0.5),
+                                                        Vector3(0.2,0.2,0.2)))
+
 
 class GpsHandler(SensorHandler):
     def __init__(self, name, sensor, **kwargs):
@@ -423,6 +431,12 @@ class GpsHandler(SensorHandler):
 
         self.process_msg_fun('tf', t)
 
+        self.process_msg_fun('sensors', self.get_marker(t.header,
+                                                        self.sensor.get_transform(),
+                                                        Marker.SPHERE,
+                                                        ColorRGBA(0.5,0,0.5,0.9),
+                                                        Vector3(0.2,0.2,0.2)))
+
 
 class RpmHandler(SensorHandler):
     def __init__(self, name, sensor, **kwargs):
@@ -469,6 +483,12 @@ class RpmHandler(SensorHandler):
 
         self.process_msg_fun('tf', t)
 
+        self.process_msg_fun('sensors', self.get_marker(t.header,
+                                                        self.sensor.get_transform(),
+                                                        ColorRGBA(0.5,0,0.9,0.5),
+                                                        Vector3(1.5,0.2,0.2)))
+
+
 
 class BoundingBoxHandler(SensorHandler):
     def __init__(self, name, sensor, **kwargs):
@@ -483,7 +503,7 @@ class BoundingBoxHandler(SensorHandler):
         msg = BoundingBox(header=header, targets=[])
         for i in range(0, len(sensor_data['distances'])):
             msg.targets.append(Target(id=i, distance=sensor_data['distances'][i], angle=sensor_data['angles'][i],
-                                      relative_rotation=sensor_data['box_rotations'][i]+90,
+                                      relative_rotation=-sensor_data['box_rotations'][i]+90,
                                       velocity=sensor_data['velocities'][i],
                                       #in_radar_fov=sensor_data['radar_distances'][i],
                                       center=Point(x=sensor_data['x_points'][i], y=sensor_data['y_points'][i]),

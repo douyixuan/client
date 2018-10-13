@@ -2,7 +2,7 @@
   "id": "basic_configuration",
   "clock_mode": 2,
   "lane_number": 0,
-  "position": 0,
+  "position": 5000,
   "bounding_data_on_radar_graph": true,
   "bounding_data_on_camera": true,
   "spawning_rotation": {
@@ -89,8 +89,8 @@
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
-        "x":0.0,
-        "y":0.0,
+        "x":50.0,
+        "y":-50.0,
         "z":175.0
       },
       "rotation": {
@@ -159,9 +159,9 @@
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
-        "x": -75.0,
-        "y": -25.0,
-        "z": 245.0
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
       },
       "rotation": {
         "pitch": 0.0,
@@ -179,9 +179,9 @@
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
-        "x":-75.0,
-        "y":-25.0,
-        "z":245.0
+        "x": 10.0,
+        "y": 10.0,
+        "z": 0.0
       },
       "rotation": {
         "pitch":0.0,
