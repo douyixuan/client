@@ -65,7 +65,7 @@
       "synchronized_display": true,
       "location": {
         "x":-75.0,
-        "y":-25.0,
+        "y":0.0,
         "z":350.0
       },
       "rotation": {
@@ -89,8 +89,8 @@
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
-        "x":50.0,
-        "y":-50.0,
+        "x":100.0,
+        "y":0.0,
         "z":175.0
       },
       "rotation": {
@@ -159,8 +159,8 @@
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
-        "x": 0.0,
-        "y": 0.0,
+        "x": -25.0,
+        "y": -25.0,
         "z": 0.0
       },
       "rotation": {
@@ -179,8 +179,8 @@
       "sensor_process": true,
       "synchronized_display": true,
       "location": {
-        "x": 10.0,
-        "y": 10.0,
+        "x": -25.0,
+        "y": 25.0,
         "z": 0.0
       },
       "rotation": {
