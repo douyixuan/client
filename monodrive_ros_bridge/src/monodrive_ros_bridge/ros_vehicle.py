@@ -39,6 +39,14 @@ class RosVehicle(BaseVehicle):
     def step_episode(self):
         control = self.drive(self.sensors)
         self.step(control)
+        sensor_data = {}
+        for sensor in self.sensors:
+            try:
+                sensor_data[sensor.name] = sensor.get_display_message(block=True, timeout=1.0)
+            except Exception as e:
+                rospy.loginfo("no data for {0}, {1}".format(sensor.name, e))
+
+        return sensor_data
 
     def drive(self, sensors):
         return {
@@ -76,7 +84,7 @@ class RosVehicle(BaseVehicle):
     def step(self, control_data):
         forward = control_data['forward']
         right = control_data['right']
-        rospy.loginfo("Sending control data forward: %.4s, right: %.4s" % (forward, right))
+#        rospy.loginfo("Sending control data forward: %.4s, right: %.4s" % (forward, right))
         msg = messaging.EgoControlCommand(forward, right)
         resp = self.simulator.request(msg)
         if resp is None:

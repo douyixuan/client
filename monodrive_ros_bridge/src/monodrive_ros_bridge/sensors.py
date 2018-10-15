@@ -69,7 +69,7 @@ class SensorHandler(object):
         self.parent_frame_id = "ego"
         self.frame_id = self.sensor.type + name
 
-    def process_sensor_data(self, vehicle, cur_time):
+    def process_sensor_data(self, data, vehicle, cur_time):
         """
         process a mono sensor data object
 
@@ -80,7 +80,8 @@ class SensorHandler(object):
         :return:
         """
         try:
-            data = self.sensor.get_display_message(block=True, timeout=1.0)
+#            rospy.loginfo("{0} q_display len: {1}".format(self.sensor.name, self.sensor.q_display.qsize()))
+#            data = self.sensor.get_display_message(block=True, timeout=5.0)
             if data:
                 self._compute_sensor_msg(data, cur_time)
                 self._compute_transform(data, self._get_transform(vehicle), cur_time)

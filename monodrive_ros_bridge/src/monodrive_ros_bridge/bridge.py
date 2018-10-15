@@ -133,7 +133,7 @@ class MonoRosBridge(object):
         :param msg: monodrive_ros_bridge message
         """
 
-        rospy.loginfo("publishing on {0}".format(topic))
+        #rospy.loginfo("publishing on {0}".format(topic))
 
         if topic not in self.publishers:
             if topic == 'tf':
@@ -191,7 +191,8 @@ class MonoRosBridge(object):
                 self.cur_time = game_time
                 self.compute_cur_time_msg()
 
-#            self.vehicle.
+            data = self.vehicle.step_episode()
+
             rospy.loginfo("process sensor data")
             for sensor in self.vehicle.sensors:
                 handlers = self.sensor_handlers.get(sensor.type, None)
@@ -203,8 +204,8 @@ class MonoRosBridge(object):
                             break
 
                     if sensor_handler:
-                        rospy.loginfo("processing {0}{1}".format(sensor.type,sensor_handler.name))
-                        sensor_handler.process_sensor_data(self.vehicle, self.cur_time)
+#                        rospy.loginfo("processing {0}{1}".format(sensor.type,sensor_handler.name))
+                        sensor_handler.process_sensor_data(data.get(sensor.name, None), self.vehicle, self.cur_time)
                     else:
                         rospy.loginfo("no handler found for {0}".format(sensor.type))
 
@@ -219,7 +220,6 @@ class MonoRosBridge(object):
             # publish all messages
             self.send_msgs()
 
-            self.vehicle.step_episode()
 
         # Waits for the restart event to be set in the control process
         rospy.loginfo('Episode loop ended')
