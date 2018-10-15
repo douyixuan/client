@@ -48,7 +48,7 @@ class SensorHandler(object):
     sensor.
     These messages are passed to a *process_msg_fun* which will take care of publishing them.
     """
-    _count = 700
+    _count = 1000
 
     def __init__(self,
                  name,
@@ -129,15 +129,18 @@ class SensorHandler(object):
         """
         raise NotImplemented
 
-    def get_marker(self, header, transform, type, color, size):
+    def get_marker(self, cur_time, type, color, size):
+        header = Header()
+        header.stamp = cur_time
+        header.frame_id = self.parent_frame_id
+
         marker = Marker(header=header)
         marker.id = self._instance_id
         marker.text = "id = {}".format(marker.id)
         #marker.action = Marker.ADD
         marker.color = color
         ros_transform = mono_transform_to_ros_transform(
-            # mono_Transform(object.bounding_box.transform) *
-            transform)
+            self.sensor.get_transform())
         marker.pose = ros_transform_to_pose(ros_transform)
 
         marker.scale = size
@@ -160,8 +163,7 @@ class LidarHandler(SensorHandler):
 
         scan = []
         for lidar_packet in sensor_data:
-            new_sensor_data = bytes(lidar_packet)
-            scan.append(VelodynePacket(stamp=cur_time, data=new_sensor_data))
+            scan.append(VelodynePacket(stamp=cur_time, data=bytes(lidar_packet)))
 
         if len(scan):
             header = Header()
@@ -169,6 +171,11 @@ class LidarHandler(SensorHandler):
             header.frame_id = self.frame_id
 
             self.process_msg_fun(topic, VelodyneScan(header=header, packets=scan))
+
+        self.process_msg_fun('/sensors', self.get_marker(cur_time,
+                                                        Marker.ARROW,
+                                                        ColorRGBA(0.9,0.0,0.0,1.0),
+                                                        Vector3(1.5,0.2,0.2)))
 
     def _compute_transform(self, sensor_data, ref, cur_time):
         if ref is None:
@@ -206,12 +213,6 @@ class LidarHandler(SensorHandler):
         #     rospy.loginfo("lidar tf: {0}".format(t.transform))
         #     rospy.loginfo("ego   tf: {0}".format(mono_transform_to_ros_transform(ref)))
         self.process_msg_fun('tf', t)
-
-        self.process_msg_fun('sensors', self.get_marker(t.header,
-                                                        self.sensor.get_transform(),
-                                                        Marker.ARROW,
-                                                        ColorRGBA(0.9,0.5,0,1),
-                                                        Vector3(1.5,0.2,0.2)))
 
 
 class CameraHandler(SensorHandler):
@@ -275,6 +276,10 @@ class CameraHandler(SensorHandler):
 
         self.process_msg_fun(self.topic_cam_info, cam_info)
         self.process_msg_fun(self.topic_image, img_msg)
+        self.process_msg_fun('/sensors', self.get_marker(cur_time,
+                                                        Marker.CYLINDER,
+                                                        ColorRGBA(0.75,0.9,0.0,0.0),
+                                                        Vector3(0.5,0.1,0.1)))
 
     def _compute_transform(self, sensor_data, ref, cur_time):
 
@@ -303,12 +308,6 @@ class CameraHandler(SensorHandler):
         t.transform.rotation.w = quat[3]
 
         self.process_msg_fun('tf', t)
-
-        self.process_msg_fun('sensors', self.get_marker(t.header,
-                                                        self.sensor.get_transform(),
-                                                        Marker.ARROW,
-                                                        ColorRGBA(0.5,0.9,0.5,0),
-                                                        Vector3(0.5,0.1,0.1)))
 
 
 class ImuHandler(SensorHandler):
@@ -344,6 +343,10 @@ class ImuHandler(SensorHandler):
         msg.linear_acceleration_covariance = [-1, -1, -1, -1, -1, -1, -1, -1, -1]
 
         self.process_msg_fun('imu', msg)
+        self.process_msg_fun('/sensors', self.get_marker(cur_time,
+                                                        Marker.SPHERE,
+                                                        ColorRGBA(0.5,0.9,0,0.5),
+                                                        Vector3(0.2,0.2,0.2)))
 
 
     def _compute_transform(self, sensor_data, ref, cur_time):
@@ -371,12 +374,6 @@ class ImuHandler(SensorHandler):
         t.transform.rotation.w = quat[3]
 
         self.process_msg_fun('tf', t)
-
-        self.process_msg_fun('sensors', self.get_marker(t.header,
-                                                        self.sensor.get_transform(),
-                                                        Marker.SPHERE,
-                                                        ColorRGBA(0.5,0.9,0,0.5),
-                                                        Vector3(0.2,0.2,0.2)))
 
 
 class GpsHandler(SensorHandler):
@@ -403,6 +400,10 @@ class GpsHandler(SensorHandler):
         msg.position_covariance_type = 0  # unknown
 
         self.process_msg_fun('gps', msg)
+        self.process_msg_fun('/sensors', self.get_marker(cur_time,
+                                                        Marker.SPHERE,
+                                                        ColorRGBA(0.5,0,0.5,0.9),
+                                                        Vector3(0.2,0.2,0.2)))
 
 
     def _compute_transform(self, sensor_data, ref, cur_time):
@@ -431,12 +432,6 @@ class GpsHandler(SensorHandler):
 
         self.process_msg_fun('tf', t)
 
-        self.process_msg_fun('sensors', self.get_marker(t.header,
-                                                        self.sensor.get_transform(),
-                                                        Marker.SPHERE,
-                                                        ColorRGBA(0.5,0,0.5,0.9),
-                                                        Vector3(0.2,0.2,0.2)))
-
 
 class RpmHandler(SensorHandler):
     def __init__(self, name, sensor, **kwargs):
@@ -454,6 +449,10 @@ class RpmHandler(SensorHandler):
         msg.wheel_rpm = sensor_data['wheel_rpm']
 
         self.process_msg_fun('rpm', msg)
+        self.process_msg_fun('sensors', self.get_marker(cur_time,
+                                                        Marker.SPHERE,
+                                                        ColorRGBA(0.5,0,0.9,0.5),
+                                                        Vector3(1.5,0.2,0.2)))
 
 
     def _compute_transform(self, sensor_data, ref, cur_time):
@@ -482,11 +481,6 @@ class RpmHandler(SensorHandler):
         t.transform.rotation.w = quat[3]
 
         self.process_msg_fun('tf', t)
-
-        self.process_msg_fun('sensors', self.get_marker(t.header,
-                                                        self.sensor.get_transform(),
-                                                        ColorRGBA(0.5,0,0.9,0.5),
-                                                        Vector3(1.5,0.2,0.2)))
 
 
 
