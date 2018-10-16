@@ -40,13 +40,16 @@ class RosVehicle(BaseVehicle):
         control = self.drive(self.sensors)
         self.step(control)
         sensor_data = {}
+        game_time = 0.0
         for sensor in self.sensors:
             try:
-                sensor_data[sensor.name] = sensor.get_display_message(block=True, timeout=1.0)
-            except Exception as e:
-                rospy.loginfo("no data for {0}, {1}".format(sensor.name, e))
+                data = sensor.get_display_message(block=True, timeout=1.0)
+                sensor_data[sensor.name] = data
+                game_time = max(game_time, data.get('game_time',0.0))
+            except:
+                pass
 
-        return sensor_data
+        return game_time, sensor_data
 
     def drive(self, sensors):
         return {

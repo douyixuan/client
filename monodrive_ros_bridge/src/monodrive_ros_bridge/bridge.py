@@ -18,7 +18,6 @@ from itertools import count
 from rosgraph_msgs.msg import Clock
 from tf2_msgs.msg import TFMessage
 import rospy
-import time
 
 
 from monodrive import Simulator, SimulatorConfiguration, VehicleConfiguration
@@ -60,12 +59,6 @@ class MonoRosBridge(object):
         self.tf_to_publish = []
         self.msgs_to_publish = []
         self.publishers = {}
-
-        # definitions useful for time
-        self.cur_time = rospy.Time.from_sec(
-            0)  # at the beginning of simulation
-        self.mono_game_stamp = 0
-        self.mono_platform_stamp = 0
 
         self.world_handler = WorldMapHandler(
             "monodrive", process_msg_fun=self.process_msg)
@@ -159,12 +152,14 @@ class MonoRosBridge(object):
             self.publishers['tf'].publish(tf_msg)
             self.tf_to_publish = []
 
-    def compute_cur_time_msg(self):
-        self.process_msg('clock', Clock(self.cur_time))
+    def compute_cur_time_msg(self, cur_time):
+        self.process_msg('clock', Clock(cur_time))
 
     def run(self):
         self.publishers['clock'] = rospy.Publisher(
             "clock", Clock, queue_size=10)
+
+        cur_time = rospy.Time.from_sec(0)  # at the beginning of simulation
 
         rospy.loginfo('Sending vehicle config')
         self.simulator.restart_event.clear()
@@ -186,12 +181,9 @@ class MonoRosBridge(object):
                 break
 
             # handle time
-            game_time = rospy.Time.now()
-            if game_time is not None:
-                self.cur_time = game_time
-                self.compute_cur_time_msg()
-
-            data = self.vehicle.step_episode()
+            game_time, data = self.vehicle.step_episode()
+            cur_time = rospy.Time.from_sec(game_time * 1e-3)
+            self.compute_cur_time_msg(cur_time)
 
             rospy.loginfo("process sensor data")
             for sensor in self.vehicle.sensors:
@@ -205,17 +197,16 @@ class MonoRosBridge(object):
 
                     if sensor_handler:
 #                        rospy.loginfo("processing {0}{1}".format(sensor.type,sensor_handler.name))
-                        sensor_handler.process_sensor_data(data.get(sensor.name, None), self.vehicle, self.cur_time)
+                        sensor_handler.process_sensor_data(data.get(sensor.name, None), self.vehicle, cur_time)
                     else:
                         rospy.loginfo("no handler found for {0}".format(sensor.type))
 
             rospy.loginfo('process world_handler')
-            self.world_handler.process_msg(self.cur_time)
+            self.world_handler.process_msg(cur_time)
 
             # handle agents
             rospy.loginfo('process agents')
-            self.player_handler.process_msg(
-                self.vehicle, cur_time=self.cur_time)
+            self.player_handler.process_msg(self.vehicle, cur_time=cur_time)
 
             # publish all messages
             self.send_msgs()
