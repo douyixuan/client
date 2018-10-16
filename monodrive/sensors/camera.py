@@ -84,14 +84,13 @@ class Camera(BaseSensor):
         image_frames = super(Camera, self).get_display_messages(block=block, timeout=timeout)
 
         for image_frame in image_frames:
-            image_buffer = bytearray(image_frame['image'])
+            image_buffer = image_frame['image']
             if len(image_buffer) == self.height * self.width * 4:
-                image = np.array(image_buffer, dtype=np.uint8).reshape(self.height, self.width, 4)
+                image = np.array(bytearray(image_buffer), dtype=np.uint8).reshape(self.height, self.width, 4)
+                image_frame_list.append(image)
             else:
-                image = None
                 logging.getLogger("sensor").error("wrong image size received {0}".format(self.name))
-            image_frame_list.append(image)
-        
+
         return image_frame_list
 
     def stop(self):
