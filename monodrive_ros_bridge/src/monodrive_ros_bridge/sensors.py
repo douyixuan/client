@@ -82,7 +82,7 @@ class SensorHandler(object):
         try:
 #            rospy.loginfo("{0} q_display len: {1}".format(self.sensor.name, self.sensor.q_display.qsize()))
 #            data = self.sensor.get_display_message(block=True, timeout=5.0)
-            if data:
+            if data is not None:
                 self._compute_sensor_msg(data, cur_time)
                 self._compute_transform(data, self._get_transform(vehicle), cur_time)
         except Exception as e:
@@ -179,15 +179,12 @@ class LidarHandler(SensorHandler):
                                                         Vector3(1.5,0.2,0.2)))
 
     def _compute_transform(self, sensor_data, ref, cur_time):
-        if ref is None:
-            return
 
         t = TransformStamped()
         t.header.stamp = cur_time
         t.header.frame_id = self.parent_frame_id
         t.child_frame_id = self.frame_id
         t.transform = mono_transform_to_ros_transform(
-#            mono_Transform(mono_Translation(0,0,0))
              self.sensor.get_transform()
         )
 
@@ -202,17 +199,6 @@ class LidarHandler(SensorHandler):
         t.transform.rotation.z = quat[2]
         t.transform.rotation.w = quat[3]
 
-        # if ref:
-        #     ref = mono_transform_to_ros_transform(ref)
-        #     t.transform.translation.x = ref.translation.x + t.transform.translation.x
-        #     t.transform.translation.y = ref.translation.y + t.transform.translation.y
-        #     t.transform.translation.z = ref.translation.z + t.transform.translation.z
-        # t.transform.translation.x = 0
-        # t.transform.translation.y = 0
-        # t.transform.translation.z = 0
-        # if ref:
-        #     rospy.loginfo("lidar tf: {0}".format(t.transform))
-        #     rospy.loginfo("ego   tf: {0}".format(mono_transform_to_ros_transform(ref)))
         self.process_msg_fun('tf', t)
 
 
@@ -266,7 +252,7 @@ class CameraHandler(SensorHandler):
         encoding = 'bgra8'
 
         #data = pickle.loads(sensor_data)
-        data = np.array(bytearray(sensor_data['image']), dtype=np.uint8).reshape(self.sensor.height, self.sensor.width, 4)
+        data = sensor_data #np.array(bytearray(sensor_data['image']), dtype=np.uint8).reshape(self.sensor.height, self.sensor.width, 4)
 
         img_msg = cv_bridge.cv2_to_imgmsg(data, encoding=encoding)
         img_msg.header.frame_id = self.frame_id
@@ -501,7 +487,8 @@ class BoundingBoxHandler(SensorHandler):
                                       relative_rotation=-sensor_data['box_rotations'][i]+90,
                                       velocity=sensor_data['velocities'][i],
                                       #in_radar_fov=sensor_data['radar_distances'][i],
-                                      center=Point(x=sensor_data['x_points'][i], y=sensor_data['y_points'][i]),
+                                      center=Point(x=sensor_data['x_points'][i], y=sensor_data['y_points'][i],
+                                                   z=-sensor_data['z_bounds'][i]),
                                       extent=Point(x=sensor_data['x_bounds'][i], y=sensor_data['y_bounds'][i],
                                                    z=sensor_data['z_bounds'][i])))
 

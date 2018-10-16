@@ -19,7 +19,6 @@ from rosgraph_msgs.msg import Clock
 from tf2_msgs.msg import TFMessage
 import rospy
 
-
 from monodrive import Simulator, SimulatorConfiguration, VehicleConfiguration
 from monodrive_ros_bridge.markers import PlayerAgentHandler, NonPlayerAgentsHandler
 from monodrive_ros_bridge.sensors import BoundingBoxHandler, CameraHandler, \

@@ -43,9 +43,13 @@ class RosVehicle(BaseVehicle):
         game_time = 0.0
         for sensor in self.sensors:
             try:
-                data = sensor.get_display_message(block=True, timeout=1.0)
-                sensor_data[sensor.name] = data
-                game_time = max(game_time, data.get('game_time',0.0))
+                data = sensor.get_display_messages(block=True, timeout=1.0)
+                if len(data) > 0:
+                    data = data.pop()
+                    sensor_data[sensor.name] = data
+                    game_time = max(game_time, data.get('game_time',0.0))
+                else:
+                    rospy.loginfo("no data for {0}".format(sensor.name))
             except:
                 pass
 
