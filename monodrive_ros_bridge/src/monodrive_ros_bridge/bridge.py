@@ -26,6 +26,7 @@ from monodrive_ros_bridge.sensors import BoundingBoxHandler, CameraHandler, \
 from monodrive_ros_bridge.world import WorldMapHandler
 
 from .ros_vehicle import RosVehicle
+from .map import Map
 
 
 
@@ -51,6 +52,7 @@ class MonoRosBridge(object):
         rospy.loginfo("Sending Simulator config")
         self.simulator = Simulator(simulator_config)
         self.simulator.send_configuration()
+        self.map = Map(self.simulator.request_map())
         self.vehicle = self.simulator.get_ego_vehicle(self.vehicle_config, RosVehicle)
 
         self.param_sensors = params.get('sensors', {})
@@ -59,8 +61,6 @@ class MonoRosBridge(object):
         self.msgs_to_publish = []
         self.publishers = {}
 
-        self.world_handler = WorldMapHandler(
-            "monodrive", process_msg_fun=self.process_msg)
         # creating handler to handle vehicles messages
         self.player_handler = PlayerAgentHandler(
             "ego", process_msg_fun=self.process_msg)
@@ -158,8 +158,6 @@ class MonoRosBridge(object):
         self.publishers['clock'] = rospy.Publisher(
             "clock", Clock, queue_size=10)
 
-        cur_time = rospy.Time.from_sec(0)  # at the beginning of simulation
-
         rospy.loginfo('Sending vehicle config')
         self.simulator.restart_event.clear()
         rospy.loginfo(self.simulator.send_vehicle_configuration(self.vehicle_config))
@@ -173,6 +171,9 @@ class MonoRosBridge(object):
         rospy.loginfo('Vehicle Started')
 
         rospy.loginfo('-- running episode')
+
+        self.map.send_map()
+
         for frame in count():
             if (frame == self.frames_per_episode) or rospy.is_shutdown():
                 rospy.loginfo("----- end episode -----")
@@ -199,9 +200,6 @@ class MonoRosBridge(object):
                         sensor_handler.process_sensor_data(data.get(sensor.name, None), self.vehicle, cur_time)
                     else:
                         rospy.loginfo("no handler found for {0}".format(sensor.type))
-
-            rospy.loginfo('process world_handler')
-            self.world_handler.process_msg(cur_time)
 
             # handle agents
             rospy.loginfo('process agents')

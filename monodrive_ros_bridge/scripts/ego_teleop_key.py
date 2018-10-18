@@ -17,7 +17,7 @@ def clamp(min_value, n, max_value):
 
 def get_key(attrs):
     tty.setraw(sys.stdin.fileno())
-    rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
+    rlist, _, _ = select.select([sys.stdin], [], [], 0.25)
     if rlist:
         key = sys.stdin.read(1)
         if ord(key) == 27:
@@ -62,10 +62,10 @@ if __name__=="__main__":
             break
         elif len(key)==3:
             if ord(key[2]) == 68:   # left
-                steering -= 0.02
+                steering += 0.02
 
             elif ord(key[2]) == 67: # right
-                steering += 0.02
+                steering -= 0.02
 
             elif ord(key[2]) == 65: # up
                 throttle += 0.05
@@ -73,6 +73,6 @@ if __name__=="__main__":
             elif ord(key[2]) == 66: # down
                 throttle -= 0.05
 
-            print("throttle: {0}, steering: {1}".format(throttle, steering))
-            send_message(publisher, steering, throttle)
+        print("throttle: {0}, steering: {1}".format(throttle, steering))
+        send_message(publisher, steering, throttle)
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, attrs)
