@@ -64,6 +64,7 @@ class MonoRosBridge(object):
         # creating handler to handle vehicles messages
         self.player_handler = PlayerAgentHandler(
             "ego", process_msg_fun=self.process_msg)
+
         # self.non_players_handler = NonPlayerAgentsHandler(
         #    "vehicles", process_msg_fun=self.process_msg)
 

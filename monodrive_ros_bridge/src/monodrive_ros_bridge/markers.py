@@ -108,9 +108,9 @@ class PlayerAgentHandler(AgentObjectHandler):
             return
 
         t.transform = mono_transform_to_ros_transform(data)
-        t.transform.translation.x = 0
-        t.transform.translation.y = 0
-        t.transform.translation.z = 0
+        # t.transform.translation.x = 0
+        # t.transform.translation.y = 0
+        # t.transform.translation.z = 0
         header = Header()
         header.stamp = cur_time
         header.frame_id = self.name

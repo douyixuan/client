@@ -1,9 +1,28 @@
 import matplotlib.pyplot as plt
+import math
 from nav_msgs.msg import OccupancyGrid
 import numpy as np
 from PIL import Image
 import rospy
 import tf
+
+
+def haversine_distance(origin, destination):
+    lat1, lon1 = origin
+    lat2, lon2 = destination
+    radius = 6371000  # meters
+
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = (math.sin(dlat / 2) * math.sin(dlat / 2) +
+         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) *
+         math.sin(dlon / 2) * math.sin(dlon / 2))
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return radius * c
+
+
+def cm2inch(value):
+    return value/2.54
 
 
 class LaneData(object):
@@ -35,7 +54,7 @@ class MapData(object):
 
 class Map(object):
 
-    def __init__(self, map_data, topic='/map'):
+    def __init__(self, map_data, topic='/monodrive'):
         self.map_data = MapData(map_data)
 
         self.map_pub = rospy.Publisher(
@@ -64,10 +83,24 @@ class Map(object):
             x_combined = np.append(x_combined, points[:, 0])
             y_combined = np.append(y_combined, points[:, 1])
 
+        bounds = self.map_data.bounds
+        w = haversine_distance((bounds["min"]["x"], bounds["min"]["y"]), (bounds["max"]["x"], bounds["min"]["y"]))
+        h = haversine_distance((bounds["min"]["x"], bounds["min"]["y"]), (bounds["min"]["x"], bounds["max"]["y"]))
+        plt.rcParams["figure.figsize"] = [cm2inch(w/10), cm2inch(h/10)]
+        plt.rcParams["axes.xmargin"] = plt.rcParams["axes.ymargin"] = 0.0
+        plt.rcParams["figure.frameon"] = False
+        plt.rcParams["figure.subplot.bottom"] = 0.
+        plt.rcParams['figure.subplot.hspace'] = 0.
+        plt.rcParams['figure.subplot.left'] = 0.
+#        plt.rcParams['figure.subplot.right'] = 0.
+#        plt.rcParams['figure.subplot.top'] = 0.
+        plt.rcParams['figure.subplot.wspace'] = 0.
+        plt.axis('off')
+
         handle = plt.plot(x_combined, y_combined, 'g.-', linestyle='None')[0]
         handle.set_xdata(x_combined)
         handle.set_ydata(y_combined)
-        plt.axis('off')
+
         plt.savefig("map.png")
 
         map_image = Image.open("map.png")
@@ -78,6 +111,7 @@ class Map(object):
 
     def build_map_message(self):
         self.map_msg = map_msg = OccupancyGrid()
+        map_msg.header.frame_id = 'monodrive'
 
         # form array for map
         map_img = self.map_image
@@ -86,22 +120,32 @@ class Map(object):
         map_msg.data = map_img.ravel().tolist()
 
         # set up general info
-        map_msg.info.resolution = 100
+        bounds = self.map_data.bounds
+        h = haversine_distance((bounds["min"]["x"], bounds["min"]["y"]), (bounds["max"]["x"], bounds["min"]["y"]))
+        v = haversine_distance((bounds["min"]["x"], bounds["min"]["y"]), (bounds["min"]["x"], bounds["max"]["y"]))
+        rospy.loginfo("{0},{1} ({2},{3})".format(h, v, map_img.shape[1], map_img.shape[0]))
+        map_msg.info.resolution = map_img.shape[1] / h
         map_msg.info.width = map_img.shape[1]
         map_msg.info.height = map_img.shape[0]
 
         # set up origin orientation
-        quat = tf.transformations.quaternion_from_euler(0, 0, np.pi)
+        rot = self.map_data.default_start["rotation"]
+        rospy.loginfo(rot)
+        quat = tf.transformations.quaternion_from_euler(np.pi, 0, np.radians(rot["yaw"]))
         map_msg.info.origin.orientation.x = quat[0]
         map_msg.info.origin.orientation.y = quat[1]
         map_msg.info.origin.orientation.z = quat[2]
         map_msg.info.origin.orientation.w = quat[3]
 
         # set up origin position
-        position = self.map_data.bounds
-        map_msg.info.origin.position.x = position['min']['x']
-        map_msg.info.origin.position.y = position['min']['y']
-        map_msg.info.origin.position.z = position['min']['z']
+        start = self.map_data.default_start
+        rospy.loginfo(start)
+        x = haversine_distance((bounds["max"]["x"], bounds["max"]["y"]), (start["location"]["x"], bounds["max"]["y"]))
+        y = haversine_distance((bounds["max"]["x"], bounds["max"]["y"]), (bounds["max"]["x"], start["location"]["y"]))
+        map_msg.info.origin.position.x = (x - h) - 36
+        map_msg.info.origin.position.y = -y + 36
+        map_msg.info.origin.position.z = 0 #-10#bounds["max"]['z']
+        rospy.loginfo("{0} -> {1}".format(bounds, map_msg.info.origin.position))
 
     def send_map(self):
         self.map_pub.publish(self.map_msg)
