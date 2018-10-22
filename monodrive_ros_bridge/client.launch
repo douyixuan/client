@@ -6,7 +6,7 @@
   <rosparam file="$(find monodrive_ros_bridge)/config/settings.yaml" command="load" />
   <param name="curr_episode" type="string" value="" />
   <node pkg="monodrive_ros_bridge" name="monodrive_ros_bridge" type="client.py" output="screen"/>
-
+  <node pkg="tf" type="static_transform_publisher" name="world_broadcaster" args="1 0 0 0 0 0 1 monodrive ego 100" />
   <include file="$(find velodyne_pointcloud)/launch/VLP-32C_points.launch">
     <arg name="frame_id" default="Lidar0" />
     <arg name="calibration" value="$(find monodrive_ros_bridge)/config/monodrive_calibration_32e.yaml"/>
