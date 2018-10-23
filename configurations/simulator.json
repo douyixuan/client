@@ -88,7 +88,7 @@
   },
   "client_settings": {
     "map": {
-      "gis_anchor": { "x": 0, "y": 0, "z": 0},
+      "gis_anchor": { "x": 40.409828, "y": -79.947601, "z": 0.416},
       "point_delta": 100.0
     },
     "gui":{
