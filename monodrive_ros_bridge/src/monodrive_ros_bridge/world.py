@@ -5,7 +5,7 @@ import tf
 
 class WorldMapHandler(object):
 
-    def __init__(self, world_frame='monodrive', process_msg_fun=None):
+    def __init__(self, world_frame='map', process_msg_fun=None):
         self.world_frame = world_frame
         self.process_msg_fun = process_msg_fun
 

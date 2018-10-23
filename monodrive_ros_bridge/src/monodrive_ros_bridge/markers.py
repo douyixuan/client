@@ -33,7 +33,7 @@ class AgentObjectHandler(object):
     In monodrive_ros_bridge messages are represented as Marker message (thus they are viewable in Rviz).
     """
 
-    def __init__(self, name, process_msg_fun=None, world_frame='monodrive'):
+    def __init__(self, name, process_msg_fun=None, world_frame='map'):
         self.name = name
         self.world_frame = world_frame
         self.process_msg_fun = process_msg_fun

@@ -54,7 +54,7 @@ class MapData(object):
 
 class Map(object):
 
-    def __init__(self, map_data, topic='/monodrive'):
+    def __init__(self, map_data, topic='/map'):
         self.map_data = MapData(map_data)
 
         self.map_pub = rospy.Publisher(
@@ -65,11 +65,14 @@ class Map(object):
     def update_map(self):
         points_by_lane = []
 
+        w = 10000
         for road_index in range(0, self.map_data.road_count()):
             road = self.map_data.road(road_index)
             for lane_index in range(0, road.lane_count()):
                 lane = road.lane(lane_index)
                 lane_points = lane.points
+                if lane.width > 0:
+                    w = min(w, lane.width)
 
                 x = list(map(lambda p: p['x'] / 100, lane_points))
                 y = list(map(lambda p: -p['y'] / 100, lane_points))
@@ -95,13 +98,15 @@ class Map(object):
 #        plt.rcParams['figure.subplot.right'] = 0.
 #        plt.rcParams['figure.subplot.top'] = 0.
         plt.rcParams['figure.subplot.wspace'] = 0.
+        plt.rcParams['savefig.pad_inches'] = 0.
+        plt.rcParams['legend.frameon'] = False
+
         plt.axis('off')
 
-        handle = plt.plot(x_combined, y_combined, 'g.-', linestyle='None')[0]
-        handle.set_xdata(x_combined)
-        handle.set_ydata(y_combined)
+        rospy.loginfo("lane width: {0}".format(w))
+        plt.plot(x_combined, y_combined, 'g.-', linestyle='None', linewidth=w/100)
 
-        plt.savefig("map.png")
+        plt.savefig("map.png", bbox_inches='tight', transparent=True, pad_inches=0)
 
         map_image = Image.open("map.png")
         map_image.load()
@@ -111,7 +116,7 @@ class Map(object):
 
     def build_map_message(self):
         self.map_msg = map_msg = OccupancyGrid()
-        map_msg.header.frame_id = 'monodrive'
+        map_msg.header.frame_id = 'map'
 
         # form array for map
         map_img = self.map_image
@@ -121,10 +126,11 @@ class Map(object):
 
         # set up general info
         bounds = self.map_data.bounds
-        h = haversine_distance((bounds["min"]["x"], bounds["min"]["y"]), (bounds["max"]["x"], bounds["min"]["y"]))
-        v = haversine_distance((bounds["min"]["x"], bounds["min"]["y"]), (bounds["min"]["x"], bounds["max"]["y"]))
-        rospy.loginfo("{0},{1} ({2},{3})".format(h, v, map_img.shape[1], map_img.shape[0]))
-        map_msg.info.resolution = map_img.shape[1] / h
+        horiz = haversine_distance((bounds["min"]["x"], bounds["min"]["y"]), (bounds["max"]["x"], bounds["min"]["y"]))
+        vert = haversine_distance((bounds["min"]["x"], bounds["min"]["y"]), (bounds["min"]["x"], bounds["max"]["y"]))
+        rospy.loginfo("{0},{1} ({2},{3})".format(horiz, vert, map_img.shape[1], map_img.shape[0]))
+        resolution = map_img.shape[1] / horiz / 10
+        map_msg.info.resolution = resolution
         map_msg.info.width = map_img.shape[1]
         map_msg.info.height = map_img.shape[0]
 
@@ -138,13 +144,13 @@ class Map(object):
         map_msg.info.origin.orientation.w = quat[3]
 
         # set up origin position
-        start = self.map_data.default_start
-        rospy.loginfo(start)
-        x = haversine_distance((bounds["max"]["x"], bounds["max"]["y"]), (start["location"]["x"], bounds["max"]["y"]))
-        y = haversine_distance((bounds["max"]["x"], bounds["max"]["y"]), (bounds["max"]["x"], start["location"]["y"]))
-        map_msg.info.origin.position.x = (x - h) - 36
-        map_msg.info.origin.position.y = -y + 36
-        map_msg.info.origin.position.z = 0 #-10#bounds["max"]['z']
+#        start = self.map_data.default_start
+#        rospy.loginfo(start)
+#        x = haversine_distance((bounds["max"]["x"], bounds["max"]["y"]), (start["location"]["x"], bounds["max"]["y"]))
+#        y = haversine_distance((bounds["max"]["x"], bounds["max"]["y"]), (bounds["max"]["x"], start["location"]["y"]))
+        map_msg.info.origin.position.x = -vert
+        map_msg.info.origin.position.y = -horiz / 2
+        map_msg.info.origin.position.z = 0
         rospy.loginfo("{0} -> {1}".format(bounds, map_msg.info.origin.position))
 
     def send_map(self):
