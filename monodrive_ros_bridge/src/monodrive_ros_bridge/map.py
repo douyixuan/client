@@ -104,7 +104,7 @@ class Map(object):
         plt.axis('off')
 
         rospy.loginfo("lane width: {0}".format(w))
-        plt.plot(x_combined, y_combined, 'g.-', linestyle='None', linewidth=w/100)
+        plt.plot(x_combined, y_combined, 'g.-', linestyle='None', markersize=w/25)
 
         plt.savefig("map.png", bbox_inches='tight', transparent=True, pad_inches=0)
 
@@ -148,8 +148,8 @@ class Map(object):
 #        rospy.loginfo(start)
 #        x = haversine_distance((bounds["max"]["x"], bounds["max"]["y"]), (start["location"]["x"], bounds["max"]["y"]))
 #        y = haversine_distance((bounds["max"]["x"], bounds["max"]["y"]), (bounds["max"]["x"], start["location"]["y"]))
-        map_msg.info.origin.position.x = -vert
-        map_msg.info.origin.position.y = -horiz / 2
+        map_msg.info.origin.position.x = -vert + 12
+        map_msg.info.origin.position.y = -(horiz / 2) + 10
         map_msg.info.origin.position.z = 0
         rospy.loginfo("{0} -> {1}".format(bounds, map_msg.info.origin.position))
 
