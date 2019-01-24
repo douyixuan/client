@@ -343,6 +343,18 @@
       },
       "fps": 1.0,
       "wheel_number": 0
+    },
+    {
+      "type": "State",
+      "id": "0",
+      "fps": 1.0,
+      "listen_port": 8777,
+      "packet_size": 1472,
+      "display_process": false,
+      "sensor_process": true,
+      "desired_tags": [
+        "vehicle"
+      ]
     }
   ]
 }

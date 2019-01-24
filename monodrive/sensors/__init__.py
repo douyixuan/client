@@ -16,3 +16,4 @@ from .rpm import RPM
 from .waypoint import Waypoint
 from .bounding_box import BoundingBox
 from .rpm import RPM
+from .state import State
