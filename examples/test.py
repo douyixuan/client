@@ -34,7 +34,7 @@ if __name__ == "__main__":
     simulator_config = SimulatorConfiguration('simulator.json')
 
     # Vehicle configuration defines ego vehicle configuration and the individual sensors configurations
-    vehicle_config = VehicleConfiguration('demo.json')
+    vehicle_config = VehicleConfiguration('state.json')
 
     client = Client((simulator_config.configuration["server_ip"],
                      simulator_config.configuration["server_port"]))
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         simulator.restart_event.clear()
         simulator.send_vehicle_configuration(vehicle_config)
         logging.getLogger("simulator").info('Starting vehicle')
-        ego_vehicle.update_fmcw_in_config()
+        #ego_vehicle.update_fmcw_in_config()
         ego_vehicle.start_sensor_streaming(client)
         ego_vehicle.start_sensor_listening()
 

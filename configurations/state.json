@@ -56,26 +56,6 @@
   ],
   "sensors": [
     {
-      "type": "BoundingBox",
-      "id": "1",
-      "packet_size": 1472,
-      "listen_port": 8082,
-      "display_process": true,
-      "sensor_process": true,
-      "synchronized_display": true,
-      "location": {
-        "x":-75.0,
-        "y":-25.0,
-        "z":245.0
-      },
-      "rotation": {
-        "pitch":0.0,
-        "yaw":0.0,
-        "roll":0.0
-      },
-      "fps": 1.0
-    },
-    {
       "type": "Waypoint",
       "id": "4",
       "packet_size": 1472,
@@ -165,9 +145,13 @@
       "packet_size": 1472,
       "display_process": false,
       "sensor_process": true,
+      "debug_drawing": true,
       "desired_tags": [
         "vehicle"
-      ]
+      ],
+	  "undesired_tags": [
+		"static"
+	  ]
     }
   ]
 }

@@ -10,8 +10,10 @@ import struct
 #import matplotlib.patches as patches
 
 from . import BaseSensor
+import json
 #matplotlib.use('TkAgg')
 
+trajectory_data = []
 
 class State(BaseSensor):
     def __init__(self, idx, config, simulator_config, **kwargs):
@@ -19,12 +21,17 @@ class State(BaseSensor):
 
     @classmethod
     def parse_frame(cls, frame, time_stamp, game_time):
+        payload = frame.decode('utf-8')
+        state = json.loads(payload)
+        state['time'] = time_stamp
+        state['game_time'] = game_time
+        trajectory_data.append(state)
 
-        data_dict = {
-            'time_stamp': time_stamp,
-            'game_time': game_time
-        }
-        return data_dict
+        text_file = open("Trajectory.json", "w")
+        text_file.write(json.dumps(trajectory_data))
+        text_file.close()
+
+        return state
 
 
 
