@@ -28,7 +28,7 @@ class State(BaseSensor):
         trajectory_data.append(state)
 
         text_file = open("Trajectory.json", "w")
-        text_file.write(json.dumps(trajectory_data))
+        text_file.write(json.dumps(trajectory_data, indent=2, sort_keys=True))
         text_file.close()
 
         return state
