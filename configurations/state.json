@@ -1,6 +1,6 @@
 {
   "id": "basic_configuration",
-  "clock_mode": 2,
+  "clock_mode": 0,
   "lane_number": 0,
   "position": 2500,
   "bounding_data_on_radar_graph": true,
@@ -55,28 +55,58 @@
     }
   ],
   "sensors": [
-    {
-      "type": "Waypoint",
-      "id": "4",
-      "packet_size": 1472,
-      "listen_port": 8083,
-      "display_process": false,
-      "sensor_process": true,
-      "synchronized_display": true,
-      "location": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
+       {
+        "type": "Lidar",
+        "id": "0",
+        "packet_size": 1472,
+        "listen_port": 8079,
+        "display_process": true,
+        "sensor_process": true,
+        "synchronized_display": true,
+        "location": {
+          "x":-75.0,
+          "y":-25.0,
+          "z":350.0
+        },
+        "rotation": {
+          "pitch":0.0,
+          "yaw":0.0,
+          "roll":0.0
+        },
+        "max_distance": 8000.0,
+        "vertical_fov_angle": 30.0,
+        "horizontal_resolution": 0.4,
+        "fps": 20.0,
+        "n_lasers": 32,
+        "reset_angle": 0.0
       },
-      "rotation": {
-        "pitch": 0.0,
-        "yaw": 0.0,
-        "roll": 0.0
+          {
+        "type":"Camera",
+        "id": "0",
+        "packet_size": 23552,
+        "listen_port": 7080,
+        "display_process": true,
+        "sensor_process": true,
+        "location": {
+          "x":38.0,
+          "y":-25.0,
+          "z":147.0
+        },
+        "rotation": {
+          "pitch":0.0,
+          "yaw":-10.0,
+          "roll":0.0
+        },
+        "max_distance": 50000.0,
+        "horizontal_fov_angle": 50.0,
+        "fps": 2.0,
+        "stream_dimensions": {
+          "x":512.0,
+          "y":512.0
+        },
+        "semantic_processing": false,
+        "hdmi_streaming": false
       },
-      "fps": 1.0,
-      "point_delta": 100.0,
-      "total_points": 100.0
-    },
     {
       "type": "GPS",
       "id": "0",
@@ -96,46 +126,6 @@
         "roll": 0.0
       },
       "fps": 1.0
-    },
-    {
-      "type": "IMU",
-      "id": "0",
-      "packet_size": 1472,
-      "listen_port": 8085,
-      "display_process": true,
-      "sensor_process": true,
-      "synchronized_display": true,
-      "location": {
-        "x":-75.0,
-        "y":-25.0,
-        "z":245.0
-      },
-      "rotation": {
-        "pitch":0.0,
-        "yaw":0.0,
-        "roll":0.0
-      },
-      "fps": 1.0
-    },
-    {
-      "type": "RPM",
-      "id": "0",
-      "packet_size": 1472,
-      "listen_port": 8086,
-      "display_process": false,
-      "sensor_process": false,
-      "location": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-      },
-      "rotation": {
-        "pitch": 0,
-        "yaw": 0,
-        "roll": 0
-      },
-      "fps": 1.0,
-      "wheel_number": 0
     },
     {
       "type": "State",
