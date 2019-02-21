@@ -1,6 +1,7 @@
 __version__ = "1.0"
 
 
+import json
 import logging
 import sys
 import time
@@ -14,6 +15,7 @@ from monodrive import SimulatorConfiguration, VehicleConfiguration, Simulator
 from monodrive.ui import GUI
 from monodrive.util import InterruptHelper
 from monodrive.vehicles import OpenSenseVehicle
+from monodrive.networking.messaging import ConfigureTrajectoryCommand, StepSimulationCommand
 
 from monodrive.networking.client import Client
 
@@ -37,46 +39,53 @@ if __name__ == "__main__":
     simulator.setup_logger()
     simulator.send_configuration()
     time.sleep(2)
-    episodes = 1  # TODO... this should come from the scenario config
-    # Setup Ego Vehicle
-    from monodrive import VehicleConfiguration
 
-    # Setup Ego Vehicle
-    ego_vehicle = OpenSenseVehicle(simulator_config, vehicle_config)
+    trajectory = json.load(open("Trajectory.json", "r"))
+    print(client.request(ConfigureTrajectoryCommand(trajectory)))
+    for i in range(0, 10):
+        print(client.request(StepSimulationCommand(1)))
+        time.sleep(2)
 
-    gui = None
+    # episodes = 1  # TODO... this should come from the scenario config
+    # # Setup Ego Vehicle
+    # from monodrive import VehicleConfiguration
+    #
+    # # Setup Ego Vehicle
+    # ego_vehicle = OpenSenseVehicle(simulator_config, vehicle_config)
+    #
+    # gui = None
 
 
-    while episodes > 0:
-        helper = InterruptHelper()
-
-        simulator.restart_event.clear()
-        simulator.send_vehicle_configuration(vehicle_config)
-        logging.getLogger("simulator").info('Starting vehicle')
-        #ego_vehicle.update_fmcw_in_config()
-        ego_vehicle.start_sensor_streaming(client)
-        ego_vehicle.start_sensor_listening()
-
-        gui = GUI(ego_vehicle, simulator)
-
-        #don't need this because we are not driving here yet
-        #ego_vehicle.init_vehicle_loop(client)
-
-        # Waits for the restart event to be set in the control process
-        time.sleep(100)
-
-        ego_vehicle.stop()
-        #helper.wait(simulator.restart_event)
-        simulator.restart_event.wait()
-
-        gui.stop()
+    # while episodes > 0:
+    #     helper = InterruptHelper()
+    #
+    #     simulator.restart_event.clear()
+    #     simulator.send_vehicle_configuration(vehicle_config)
+    #     logging.getLogger("simulator").info('Starting vehicle')
+    #     #ego_vehicle.update_fmcw_in_config()
+    #     ego_vehicle.start_sensor_streaming(client)
+    #     ego_vehicle.start_sensor_listening()
+    #
+    #     gui = GUI(ego_vehicle, simulator)
+    #
+    #     #don't need this because we are not driving here yet
+    #     #ego_vehicle.init_vehicle_loop(client)
+    #
+    #     # Waits for the restart event to be set in the control process
+    #     time.sleep(100)
+    #
+    #     ego_vehicle.stop()
+    #     #helper.wait(simulator.restart_event)
+    #     simulator.restart_event.wait()
+    #
+    #     gui.stop()
 
         # Terminates vehicle and sensor processes
-        simulator.stop()
+    simulator.stop()
 
-        logging.getLogger("simulator").info("episode complete")
-        time.sleep(1)
+    logging.getLogger("simulator").info("episode complete")
+    time.sleep(1)
 
-        episodes = episodes - 1
+#        episodes = episodes - 1
 
     logging.getLogger("simulator").info("Good Bye!")

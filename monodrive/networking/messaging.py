@@ -223,3 +223,20 @@ class DetachSensorCommand(Message):
                 "sensor": sensor
             })
 
+
+class ConfigureTrajectoryCommand(Message):
+    def __init__(self, trajectory):
+        super(ConfigureTrajectoryCommand, self).__init__(
+            REPLAY_ConfigureTrajectoryCommand_ID,
+            trajectory
+        )
+
+
+class StepSimulationCommand(Message):
+    def __init__(self, value):
+        super(StepSimulationCommand, self).__init__(
+            REPLAY_StepSimulationCommand_ID,
+            { "amount": value }
+        )
+
+
