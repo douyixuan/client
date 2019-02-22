@@ -240,3 +240,9 @@ class StepSimulationCommand(Message):
         )
 
 
+class ConfigureSensorsCommand(Message):
+    def __init__(self, sensorConfig):
+        super(ConfigureSensorsCommand, self).__init__(
+            REPLAY_ConfigureSensorsCommand_ID,
+            sensorConfig
+        )
