@@ -137,6 +137,7 @@ class BaseVehicle(object):
         [p.start() for p in self.get_process_list()]
         logging.getLogger("vehicle").debug("waiting for sensors ready")
         [s.wait_until_ready() for s in self.sensors]
+        logging.getLogger("vehicle").debug("all sensors are ready")
         return 1
 
     '''def start(self):

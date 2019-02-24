@@ -243,48 +243,6 @@
       "hdmi_streaming": false
     },
     {
-      "type": "BoundingBox",
-      "id": "1",
-      "packet_size": 1472,
-      "listen_port": 8082,
-      "display_process": true,
-      "sensor_process": true,
-      "synchronized_display": true,
-      "location": {
-        "x":-75.0,
-        "y":-25.0,
-        "z":245.0
-      },
-      "rotation": {
-        "pitch":0.0,
-        "yaw":0.0,
-        "roll":0.0
-      },
-      "fps": 1.0
-    },
-    {
-      "type": "Waypoint",
-      "id": "4",
-      "packet_size": 1472,
-      "listen_port": 8083,
-      "display_process": false,
-      "sensor_process": true,
-      "synchronized_display": true,
-      "location": {
-        "x": 0.0,
-        "y": 0.0,
-        "z": 0.0
-      },
-      "rotation": {
-        "pitch": 0.0,
-        "yaw": 0.0,
-        "roll": 0.0
-      },
-      "fps": 1.0,
-      "point_delta": 100.0,
-      "total_points": 100.0
-    },
-    {
       "type": "GPS",
       "id": "0",
       "packet_size": 1472,
@@ -343,18 +301,6 @@
       },
       "fps": 1.0,
       "wheel_number": 0
-    },
-    {
-      "type": "State",
-      "id": "0",
-      "fps": 1.0,
-      "listen_port": 8777,
-      "packet_size": 1472,
-      "display_process": false,
-      "sensor_process": true,
-      "desired_tags": [
-        "vehicle"
-      ]
     }
   ]
 }

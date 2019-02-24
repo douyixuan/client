@@ -250,7 +250,7 @@ class BaseSensor(object):
             packet, address = self.sock.recvfrom(self.packet_size)
             if self.packetizer_process is None:
                 offset = 8
-                time_stamp, game_time = struct.unpack('=If', packet[:offset])
+                time_stamp, game_time = struct.unpack('!If', packet[:offset])
                 packet = packet[offset:]
         else:
             received = 0
@@ -263,7 +263,7 @@ class BaseSensor(object):
                 self.stop()  # socket is dead - must stop
 
             if packet_header is not None and received == header_size:
-                length, time_stamp, game_time = struct.unpack('=IIf', packet_header)
+                length, time_stamp, game_time = struct.unpack('!IIf', packet_header)
 
                 length = length - header_size
 
