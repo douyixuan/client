@@ -5,7 +5,6 @@ __copyright__ = "Copyright (C) 2018 monoDrive"
 __license__ = "MIT"
 __version__ = "1.0"
 
-from monodrive.ui.guiincludes import *
 from monodrive.ui.radarview import *
 from monodrive.ui.boundboxview import *
 from monodrive.ui.roadmapview import *
@@ -106,7 +105,7 @@ class CameraPanel(wx.Panel):
 
 
 class MainFrame(wx.Frame):
-    def __init__(self, cameras):
+    def __init__(self, sensors):
         width = int(wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X) * .9)
         height = int(wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) * .9)
         wx.Frame.__init__(self, None, size=(width, height), title = "monoDrive Visualizer")
@@ -115,16 +114,29 @@ class MainFrame(wx.Frame):
         p = wx.Panel(self)
         nb = wx.Notebook(p)
 
-        # create the page windows as children of the notebook
-        overview = Overview_Panel(nb, cameras)
-        radar = Radar_Panel(nb)
-        #camera = Camera_View(nb, "Camera")
-        camera = CameraPanel(nb, cameras)
+        cameras = 0
+        overview_panel = False
+        radar_panel = False
+        for sensor in sensors:
+            if sensor.type in ["BoundingBox","Waypoint","GPS","IMU","RPM"]:
+                overview_panel = True
+            elif sensor.type == "Camera":
+                cameras += 1
+            elif sensor.type == "Radar":
+                radar_panel = True
 
-        # add the pages to the notebook with the label to show on the tab
-        nb.AddPage(overview, "All Sensors")
-        nb.AddPage(radar, "Radar")
-        nb.AddPage(camera, "Camera")
+        # create the page windows as children of the notebook
+        if overview_panel:
+            overview = Overview_Panel(nb, cameras)
+            nb.AddPage(overview, "All Sensors")
+
+        if radar_panel:
+            radar = Radar_Panel(nb)
+            nb.AddPage(radar, "Radar")
+
+        if cameras > 0:
+            camera = CameraPanel(nb, cameras)
+            nb.AddPage(camera, "Camera")
 
         # finally, put the notebook in a sizer for the panel to manage
         # the layout
@@ -140,10 +152,10 @@ class MainFrame(wx.Frame):
 #class MonoDriveGUIApp(wx.App, wx.lib.mixins.inspection.InspectionMixin):
 class MonoDriveGUIApp(wx.App):
     #def OnInit(self, num_cameras):
-    def __init__(self, cameras):
+    def __init__(self, sensors):
         wx.App.__init__(self)
         #self.Init()  # initialize the inspection tool
-        self.MainWindow = MainFrame(cameras)
+        self.MainWindow = MainFrame(sensors)
         self.MainWindow.Show(True)
         self.SetTopWindow(self.MainWindow)
         #wx.lib.inspection.InspectionTool().Show()
@@ -225,7 +237,7 @@ class SensorPoll(Thread):
                 if not self.update_gui(sensor):
                     break
 
-            if self.clock_mode == ClockMode_ClientStep:
+            if self.clock_mode == ClockMode_ClientStep and self.vehicle_step_event is not None:
                 self.vehicle_step_event.set()
 
             if self.road_map:
@@ -237,6 +249,7 @@ class SensorPoll(Thread):
 
 class GUISensor(object):
     def __init__(self, sensor, **kwargs):
+        self.type = sensor.type
         self.name = sensor.name
         self.queue = sensor.q_display
         if 'Camera' in sensor.name:
@@ -278,6 +291,7 @@ class LidarGUISensor(GUISensor):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.veloview_socket = s
+            logging.getLogger("gui").debug('Lidar connected to {0}'.format(str((VELOVIEW_PORT, VELOVIEW_PORT))))
             return s
         except Exception as e:
             logging.getLogger("gui").debug('Cannot connect to {0}'.format(str((VELOVIEW_PORT, VELOVIEW_PORT))))
@@ -292,8 +306,8 @@ class GUI(object):
         self.daemon = True
         self.name = "GUI"
         self.simulator_event = simulator.restart_event
-        self.vehicle_step_event = ego_vehicle.vehicle_step_event
-        self.vehicle_clock_mode = ego_vehicle.vehicle_config.clock_mode
+        self.vehicle_step_event = ego_vehicle.vehicle_step_event if ego_vehicle else None
+        self.vehicle_clock_mode = ego_vehicle.vehicle_config.clock_mode if ego_vehicle else 0
         #for instance in ego_vehicle.sensor_process_dict:
         #    print(instance)
             #print(instance.name)
@@ -355,7 +369,7 @@ class GUI(object):
         monitor = Thread(target=self.monitor_process_state)
         monitor.start()
 
-        self.app = MonoDriveGUIApp(self.cameras)
+        self.app = MonoDriveGUIApp(self.sensors)
 
         #prctl.set_proctitle("mono{0}".format(self.name))
         #start sensor polling

@@ -156,6 +156,7 @@ class Client(object):
     def request(self, message, timeout=5):
         """ Return a response from Unreal """
         def do_request():
+            logging.getLogger('network').info('--> {0}'.format(message))
             if not self.message_client.send(message):
                 return None
 
@@ -170,6 +171,7 @@ class Client(object):
         #while len(responses) < num_messages:
         try:
             response = self.responses.get(True, timeout)
+            logging.getLogger("network").info('<-- {0}'.format(response))
             #responses.append(response)
         except Empty:
             logging.getLogger("network").error('Can not receive a response from server. \
