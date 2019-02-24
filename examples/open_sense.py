@@ -48,7 +48,8 @@ if __name__ == "__main__":
     print(client.request(ConfigureSensorsCommand(sensors)))
 
     # load simulation
-    trajectory = json.load(open(os.path.join(configPath, "Trajectory.json"), "r"))
+#    trajectory = json.load(open(os.path.join(configPath, "LaneChangeReplay.json"), "r"))
+    trajectory = json.load(open(os.path.join(configPath, "LeftTurnCrossWalk.json"), "r"))
     print(client.request(ConfigureTrajectoryCommand(trajectory)))
 
     vehicle = OpenSenseVehicle(simulator_config, vehicle_config)
@@ -60,14 +61,14 @@ if __name__ == "__main__":
     # step simulation
     for i in range(0, len(trajectory)):
         print(client.request(StepSimulationCommand(1)))
-        time.sleep(.25)
+        time.sleep(1)
 
-    trajectory = json.load(open(os.path.join(configPath, "LeftTurnCrossWalk.json"), "r"))
-    print(client.request(ConfigureTrajectoryCommand(trajectory)))
-
-    for i in range(0, len(trajectory)):
-        print(client.request(StepSimulationCommand(1)))
-        time.sleep(.25)
+    # trajectory = json.load(open(os.path.join(configPath, "LeftTurnCrossWalk.json"), "r"))
+    # print(client.request(ConfigureTrajectoryCommand(trajectory)))
+    #
+    # for i in range(0, len(trajectory)):
+    #     print(client.request(StepSimulationCommand(1)))
+    #     time.sleep(.25)
 
     time.sleep(10)
 

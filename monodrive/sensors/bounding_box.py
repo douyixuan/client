@@ -37,7 +37,7 @@ class BoundingBox(BaseSensor):
 
     @classmethod
     def parse_frame(cls, frame, time_stamp, game_time):
-        fmt = '=hi'
+        fmt = '!hi'
         cur_frame_start = 0
         cur_frame_end = 6
         start_id, number_of_targets = list(struct.unpack(fmt, frame[cur_frame_start:cur_frame_end]))
@@ -68,13 +68,13 @@ class BoundingBox(BaseSensor):
                 radar_angles = np.multiply(in_radar_fov_points[:, 1], -1)
                 radar_velocities = in_radar_fov_points[:, 6]
 
-        fmt = '=i'
+        fmt = '!i'
         cur_frame_start = cur_frame_end
         cur_frame_end = cur_frame_start+4
         number_of_cameras = list(struct.unpack(fmt, frame[cur_frame_start:cur_frame_end]))[0]
 
         for i in range(0, number_of_cameras):
-            fmt = '=i'
+            fmt = '!i'
             cur_frame_start = cur_frame_end
             cur_frame_end = cur_frame_start+4
             camera_id = str(list(struct.unpack(fmt, frame[cur_frame_start:cur_frame_end]))[0])
