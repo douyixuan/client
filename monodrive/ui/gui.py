@@ -114,14 +114,15 @@ class MainFrame(wx.Frame):
         p = wx.Panel(self)
         nb = wx.Notebook(p)
 
-        cameras = 0
+        cameras = []
         overview_panel = False
         radar_panel = False
         for sensor in sensors:
             if sensor.type in ["BoundingBox","Waypoint","GPS","IMU","RPM"]:
                 overview_panel = True
             elif sensor.type == "Camera":
-                cameras += 1
+                #cameras += 1
+                cameras.append(sensor.name)
             elif sensor.type == "Radar":
                 radar_panel = True
 
@@ -134,7 +135,7 @@ class MainFrame(wx.Frame):
             radar = Radar_Panel(nb)
             nb.AddPage(radar, "Radar")
 
-        if cameras > 0:
+        if len(cameras) > 0:
             camera = CameraPanel(nb, cameras)
             nb.AddPage(camera, "Camera")
 

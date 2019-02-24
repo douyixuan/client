@@ -13,6 +13,8 @@ except:
 
 from monodrive import SimulatorConfiguration, VehicleConfiguration, Simulator
 from monodrive.networking.messaging import ConfigureSensorsCommand, ConfigureTrajectoryCommand, StepSimulationCommand
+from monodrive.vehicles import OpenSenseVehicle
+from monodrive.ui import GUI
 
 from monodrive.networking.client import Client
 
@@ -25,7 +27,7 @@ if __name__ == "__main__":
     simulator_config = SimulatorConfiguration('simulator.json')
 
     # Vehicle configuration defines ego vehicle configuration and the individual sensors configurations
-    vehicle_config = VehicleConfiguration('state.json')
+    vehicle_config = VehicleConfiguration('demo.json')
 
     client = Client((simulator_config.configuration["server_ip"],
                      simulator_config.configuration["server_port"]))
@@ -41,12 +43,18 @@ if __name__ == "__main__":
                               "..", "configurations", "open_sense")
 
     # load sensors
-    sensors = json.load(open(os.path.join(configPath, "sensors.json"), "r"))
+    # sensors = json.load(open(os.path.join(configPath, "sensors.json"), "r"))
+    sensors = vehicle_config.sensor_configuration
     print(client.request(ConfigureSensorsCommand(sensors)))
 
     # load simulation
     trajectory = json.load(open(os.path.join(configPath, "Trajectory.json"), "r"))
     print(client.request(ConfigureTrajectoryCommand(trajectory)))
+
+    vehicle = OpenSenseVehicle(simulator_config, vehicle_config)
+    gui = GUI(vehicle, simulator)
+
+    vehicle.start_sensor_listening()
 
     # step simulation
     for i in range(0, len(trajectory)):
@@ -55,6 +63,7 @@ if __name__ == "__main__":
 
     # Terminates vehicle and sensor processes
     simulator.stop()
+    gui.stop()
 
     logging.getLogger("simulator").info("episode complete")
     time.sleep(1)
