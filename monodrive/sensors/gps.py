@@ -20,7 +20,7 @@ class GPS(BaseSensor):
 
     @classmethod
     def parse_frame(cls, frame, time_stamp, game_time):
-        fmt = '=chhcdddfffffffhhcch'
+        fmt = '!chhcdddfffffffhhcch'
         preamble, MSG_POS_LLH, sensor_id, payload_length, lat, lng, elev, loc_x, loc_y, for_x, for_y, for_z, ego_yaw, speed, \
         h_ac, v_ac, sats, status, crc = list(
             struct.unpack(fmt, frame))

@@ -21,6 +21,7 @@ class Lidar(BaseSensor):
         self.expected_frames_per_step = number_packets
 
     def digest_frame(self, frame, time_stamp, game_time):
+        #print("LIDAR FRAME ", len(self.frame_buffer))
         self.frame_buffer.append(frame)
         if len(self.frame_buffer) == self.expected_frames_per_step:
             temp_buffer = self.frame_buffer

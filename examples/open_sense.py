@@ -53,13 +53,23 @@ if __name__ == "__main__":
 
     vehicle = OpenSenseVehicle(simulator_config, vehicle_config)
     gui = GUI(vehicle, simulator)
+    time.sleep(5)
 
     vehicle.start_sensor_listening()
 
     # step simulation
     for i in range(0, len(trajectory)):
         print(client.request(StepSimulationCommand(1)))
-        time.sleep(2)
+        time.sleep(.25)
+
+    trajectory = json.load(open(os.path.join(configPath, "LeftTurnCrossWalk.json"), "r"))
+    print(client.request(ConfigureTrajectoryCommand(trajectory)))
+
+    for i in range(0, len(trajectory)):
+        print(client.request(StepSimulationCommand(1)))
+        time.sleep(.25)
+
+    time.sleep(10)
 
     # Terminates vehicle and sensor processes
     simulator.stop()

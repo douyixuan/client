@@ -30,12 +30,14 @@ class Radar_FFT_Plot(wx.Panel):
         pub.subscribe(self.update_view, "update_radar_table")
 
     def update_view(self, msg):
-        radar_msg = Radar_Message(msg)
-        if radar_msg:
-            range_fft = radar_msg.range_fft
-            target_range_idx = radar_msg.target_range_idx
-            self.update_range_fft_plot(range_fft, target_range_idx)
-
+        try:
+            radar_msg = Radar_Message(msg)
+            if radar_msg:
+                range_fft = radar_msg.range_fft
+                target_range_idx = radar_msg.target_range_idx
+                self.update_range_fft_plot(range_fft, target_range_idx)
+        except:
+            pass
 
     def update_range_fft_plot(self, range_fft, target_range_idx):
         x = range(int(round(len(range_fft)/4)))
