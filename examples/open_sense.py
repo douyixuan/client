@@ -12,8 +12,9 @@ except:
     pass
 
 from monodrive import SimulatorConfiguration, VehicleConfiguration, Simulator
-from monodrive.networking.messaging import ConfigureSensorsCommand, ConfigureTrajectoryCommand, StepSimulationCommand
+from monodrive.networking.messaging import ConfigureSensorsCommand, ConfigureTrajectoryCommand, StepSimulationCommand, EgoControlCommand
 from monodrive.vehicles import OpenSenseVehicle
+from monodrive.vehicles import TeleportVehicle
 from monodrive.ui import GUI
 
 from monodrive.networking.client import Client
@@ -52,16 +53,27 @@ if __name__ == "__main__":
     trajectory = json.load(open(os.path.join(configPath, "LeftTurnCrossWalk.json"), "r"))
     print(client.request(ConfigureTrajectoryCommand(trajectory)))
 
+    #if ManualDriveMode:
+        #vehicle = TeleportVehicle(simulator_config, vehicle_config)
+    #else:
     vehicle = OpenSenseVehicle(simulator_config, vehicle_config)
+
     gui = GUI(vehicle, simulator)
     time.sleep(5)
 
     vehicle.start_sensor_listening()
-
+    #
+    init = True
     # step simulation
     for i in range(0, len(trajectory)):
         print(client.request(StepSimulationCommand(1)))
-        time.sleep(1)
+        msg = EgoControlCommand(1.0, 1.0)
+        resp = client.request(msg)
+        if resp is None:
+            logging.getLogger("control").error(
+                "Failed response from sending control data")
+
+        time.sleep(1.0)
 
     # trajectory = json.load(open(os.path.join(configPath, "LeftTurnCrossWalk.json"), "r"))
     # print(client.request(ConfigureTrajectoryCommand(trajectory)))
