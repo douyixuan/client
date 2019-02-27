@@ -23,8 +23,6 @@ class State(BaseSensor):
     def parse_frame(cls, frame, time_stamp, game_time):
         payload = frame.decode('utf-8')
         state = json.loads(payload)
-        state['time'] = time_stamp
-        state['game_time'] = game_time
         trajectory_data.append(state)
 
         text_file = open("Trajectory.json", "w")
