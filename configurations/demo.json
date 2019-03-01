@@ -158,7 +158,7 @@
           "x":512.0,
           "y":512.0
         },
-        "semantic_processing": false,
+        "semantic_processing": true,
         "hdmi_streaming": false
       },
       {

@@ -73,7 +73,7 @@ if __name__ == "__main__":
             logging.getLogger("control").error(
                 "Failed response from sending control data")
 
-        time.sleep(1.0)
+        time.sleep(.25)
 
     # trajectory = json.load(open(os.path.join(configPath, "LeftTurnCrossWalk.json"), "r"))
     # print(client.request(ConfigureTrajectoryCommand(trajectory)))
@@ -85,6 +85,7 @@ if __name__ == "__main__":
     time.sleep(10)
 
     # Terminates vehicle and sensor processes
+    vehicle.stop()
     simulator.stop()
     gui.stop()
 

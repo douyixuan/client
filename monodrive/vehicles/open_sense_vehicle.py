@@ -41,6 +41,5 @@ class OpenSenseVehicle(BaseVehicle):
         return control
 
     def stop(self):
-        self.keyboard_thread_running = False
         super(OpenSenseVehicle, self).stop()
-        self.keyboard_thread.join()
+        

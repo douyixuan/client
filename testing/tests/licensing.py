@@ -34,7 +34,7 @@ class GoodLicenseTest(BaseTest):
         #assert self.env.simulator_running.get()
 
         simulator = self.env.get_simulator()
-        result = simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        result = simulator.request(messaging.Message(messaging.Status_ID))
         assert result is not None and result.data is not None
         assert result.data['license']['valid']
 
@@ -61,7 +61,7 @@ class MissingLicenseTest(BaseTest):
         time.sleep(10)
 
         simulator = self.env.get_simulator()
-        result = simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        result = simulator.request(messaging.Message(messaging.Status_ID))
         assert result is None or result.data is not None
         if result:
             assert result.data['license']['valid'] is False
@@ -99,7 +99,7 @@ class BadLicenseTest(BaseTest):
         time.sleep(10)
 
         simulator = self.env.get_simulator()
-        result = simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        result = simulator.request(messaging.Message(messaging.Status_ID))
         assert result is None or result.data is not None
         if result:
             assert result.data['license']['valid'] is False

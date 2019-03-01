@@ -128,9 +128,9 @@ class TeleportVehicle(BaseVehicle):
     def _get_keyboard_control(self, key):
         status = True
         if key == K_LEFT or key == K_a:
-            self.steer += -.02
+            self.steer += -.05
         if key == K_RIGHT or key == K_d:
-            self.steer += .02
+            self.steer += .05
         if key == K_UP or key == K_w:
             self.throttle += .05
         if key == K_DOWN or key == K_s:

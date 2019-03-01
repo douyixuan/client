@@ -107,7 +107,7 @@ class Simulator(object):
     def send_vehicle_configuration(self, vehicle_configuration):
         logging.getLogger("simulator").info('Sending vehicle configuration {0}'.format(vehicle_configuration.name))
         vehicle_response = self.request(messaging.JSONConfigurationCommand(
-            VEHICLE_CONFIG_COMMAND_UUID, vehicle_configuration.configuration))
+            EgoVehicleConfig_ID, vehicle_configuration.configuration))
         logging.getLogger("simulator").info("Response:" + str(vehicle_response))
         if vehicle_response is None:
             logging.getLogger("network").error('Failed to send the vehicle configuration')
@@ -120,7 +120,7 @@ class Simulator(object):
         logging.getLogger("simulator").info('Sending simulator configuration ip:{0}:{1}'
                                             .format(self.configuration.server_ip, self.configuration.server_port))
 
-        msg = messaging.JSONConfigurationCommand(SIMULATOR_CONFIG_COMMAND_UUID, self.configuration.configuration)
+        msg = messaging.JSONConfigurationCommand(SimulatorConfig_ID, self.configuration.configuration)
         simulator_response = self.request(msg)
         logging.getLogger("simulator").info("Response:" + str(simulator_response))
         if simulator_response is None:

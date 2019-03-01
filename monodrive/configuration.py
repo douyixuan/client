@@ -61,6 +61,7 @@ class VehicleConfiguration(Configuration):
         self.wheels = self.configuration['wheels']
         self.sensor_configuration = self.configuration['sensors']
         self.clock_mode = self.configuration['clock_mode']
+        self.clock_mode = 2
 
         if not self.validate_sensors():
             raise AttributeError("Invalid Configuration. Validate the file is valid JSON.")

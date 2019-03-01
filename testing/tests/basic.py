@@ -19,12 +19,12 @@ class SimulatorConfigTest(BaseTest):
         time.sleep(10)
 
         simulator = self.env.get_simulator()
-        result = simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        result = simulator.request(messaging.Message(messaging.Status_ID))
         assert result is not None and result.data is not None
         assert result.data['configuration'] == "none"
 
         simulator.send_configuration()
-        result = simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        result = simulator.request(messaging.Message(messaging.Status_ID))
         assert result is not None and result.data is not None
         assert result.data['configuration'] != "none"
 
@@ -48,11 +48,11 @@ class EgoConfigTest(BaseTest):
 
         simulator = self.env.get_simulator()
         simulator.send_configuration()
-        simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        simulator.request(messaging.Message(messaging.Status_ID))
         simulator.send_vehicle_configuration(self.env.get_vehicle_config())
 
         time.sleep(10)
-        result = simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        result = simulator.request(messaging.Message(messaging.Status_ID))
         assert result is not None and result.data is not None and result.data['vehicle_manager'] is not None
         vm = result.data['vehicle_manager']
         assert vm['ego']
@@ -77,17 +77,17 @@ class EgoControlTest(BaseTest):
 
         simulator = self.env.get_simulator()
         simulator.send_configuration()
-        simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        simulator.request(messaging.Message(messaging.Status_ID))
         simulator.send_vehicle_configuration(self.env.get_vehicle_config())
 
         time.sleep(10)
-        result = simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        result = simulator.request(messaging.Message(messaging.Status_ID))
         vm = result.data['vehicle_manager']
         position = vm['ego']['location']
         speed = vm['ego']['speed']
         simulator.request(messaging.EgoControlCommand(2.5, 0.0))
         time.sleep(1)
-        result = simulator.request(messaging.Message(messaging.SIMULATOR_STATUS_UUID))
+        result = simulator.request(messaging.Message(messaging.Status_ID))
         vm = result.data['vehicle_manager']
 
         assert vm['ego']['speed'] > speed

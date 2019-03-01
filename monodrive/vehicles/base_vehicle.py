@@ -48,7 +48,8 @@ class BaseVehicle(object):
 
     def stop_vehicle(self, timeout=2):
         self.vehicle_stop.set()
-        self.vehicle_thread.join(timeout=timeout)
+        if self.vehicle_thread:
+            self.vehicle_thread.join(timeout=timeout)
         self.vehicle_thread = None
     
     def vehicle_loop(self, client):
@@ -56,7 +57,7 @@ class BaseVehicle(object):
         self.step(client, {'forward': 0.0, 'right': 0.0})
         
         sensors = self.get_sensors()
-        time.sleep(1)
+        time.sleep(.1)
         # self.ready_event.set()
         while not self.vehicle_stop.wait(self.vehicle_update_rate):
             if self.wait_for_drive_ready():
@@ -161,8 +162,8 @@ class BaseVehicle(object):
         logging.getLogger("sensor").info("stopping all sensors")
 
         # stopping simulator from sending data
-        logging.getLogger("sensor").debug("stopping sensor from streaming data")
-        [s.send_stop_stream_command(self.simulator) for s in self.sensors]
+        #logging.getLogger("sensor").debug("stopping sensor from streaming data")
+        #[s.send_stop_stream_command(self.simulator) for s in self.sensors]
 
         logging.getLogger("sensor").info("stopping sensor processes")
         [s.stop() for s in self.sensors]

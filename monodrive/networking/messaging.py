@@ -115,7 +115,7 @@ class StreamDataCommand(Message):
             raise AttributeError('PacketSize is required.')  # TODO: make packet_size an argument
 
         super(StreamDataCommand, self).__init__(
-            STREAM_DATA_COMMAND_UUID,
+            StreamData_ID,
             {
                 u"device_type": device,
                 u"device_id": id,
@@ -141,7 +141,7 @@ class EgoControlCommand(Message):
 
     def __init__(self, forward, right):
         super(EgoControlCommand, self).__init__(
-            EGO_CONTROL_COMMAND_UID,
+            EgoControl_ID,
             {
                 u"forward_amount": forward,
                 u"right_amount": right
@@ -153,7 +153,7 @@ class WaypointUpdateCommand(Message):
 
     def __init__(self, position, lane):
         super(WaypointUpdateCommand, self).__init__(
-            WAYPOINT_UPDATE_COMMAND_UID,
+            WaypointUpdate_ID,
             {
                 u"update_start_position": position,
                 u"ego_vehicle_current_lane": lane
@@ -165,7 +165,7 @@ class ScenarioModelCommand(Message):
 
     def __init__(self, scenario):
         super(ScenarioModelCommand, self).__init__(
-            SCENARIO_COMMAND_UID, scenario)
+            ScenarioConfig_ID, scenario)
 
 
 class ScenarioInitCommand(Message):
@@ -173,7 +173,7 @@ class ScenarioInitCommand(Message):
 
     def __init__(self, init):
         super(ScenarioInitCommand, self).__init__(
-            SCENARIO_INIT_COMMAND_UID, init)
+            ScenarioInit_ID, init)
 
 
 class MapCommand(Message):
@@ -181,7 +181,7 @@ class MapCommand(Message):
 
     def __init__(self, config):
         super(MapCommand, self).__init__(
-            MAP_COMMAND_UID, config)
+            MapCommand_ID, config)
 
 
 class SpawnCommand(Message):
@@ -189,7 +189,7 @@ class SpawnCommand(Message):
 
     def __init__(self, config):
         super(SpawnCommand, self).__init__(
-            SPAWN_COMMAND_UID, config)
+            SpawnActorCommand_ID, config)
 
 
 class MoveActorCommand(Message):
@@ -197,7 +197,7 @@ class MoveActorCommand(Message):
 
     def __init__(self, config):
         super(MoveActorCommand, self).__init__(
-            MOVE_ACTOR_COMMAND_UID, config)
+            UpdateActorCommand_ID, config)
 
 
 class AttachSensorCommand(Message):
@@ -205,7 +205,7 @@ class AttachSensorCommand(Message):
 
     def __init__(self, vehicle_id, sensor):
         super(AttachSensorCommand, self).__init__(
-            ATTACH_SENSOR_COMMAND_UID,
+            AttachSensorCommand_ID,
             {
                 "vehicle_id": vehicle_id,
                 "sensor": sensor
@@ -217,7 +217,7 @@ class DetachSensorCommand(Message):
 
     def __init__(self, vehicle_id, sensor):
         super(DetachSensorCommand, self).__init__(
-            DETACH_SENSOR_COMMAND_UID,
+            DetachSensorCommand_ID,
             {
                 "vehicle_id": vehicle_id,
                 "sensor": sensor
