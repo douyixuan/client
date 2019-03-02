@@ -16,6 +16,7 @@ import multiprocessing
 
 import numpy.fft as fftpack
 import pyfftw
+import json
 import math
 import time
 
@@ -103,6 +104,7 @@ class Base_Radar(BaseSensor):
 
         self.is_root_music = True
         self.hann_matrix_range, self.hann_matrix_aoa = self.build_hanning()
+        self.b_local_processing = False
 
     def pa_output_voltage(self):
         pa_max_dbm = 13.5 #dbm
@@ -165,7 +167,25 @@ class Base_Radar(BaseSensor):
     def parse_frame(self, frame, time_stamp, game_time):
         radar_data = {}
         #print("radar parse_frame")
-        if self.process_frame(frame):
+
+        if not self.b_local_processing:
+            payload = frame.decode('utf-8')
+            payload = json.loads(payload)
+            print(payload)
+            radar_data['time_stamp'] = time_stamp
+            radar_data['game_time'] = game_time
+            radar_data['ranges'] = payload['message']['ranges']
+            radar_data['velocities'] = payload['message']['velocities']
+            radar_data['aoa_list'] = payload['message']['aoas']
+            radar_data['rcs_list'] = []
+            radar_data['power_list'] = []
+            radar_data['range_fft'] = []
+            radar_data['rx_signal'] = []
+            radar_data['target_range_idx'] = payload['message']['ranges']
+            radar_data['tx_waveform'] = self.tx_waveform
+            radar_data['time_series'] = self.time_series
+
+        elif self.process_frame(frame):
             radar_data['time_stamp'] = time_stamp
             radar_data['game_time'] = game_time
             radar_data['ranges'] = self.targets_range 

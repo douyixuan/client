@@ -19,7 +19,7 @@ from monodrive.ui import GUI
 
 from monodrive.networking.client import Client
 
-ManualDriveMode = True
+ManualDriveMode = False
 
 
 if __name__ == "__main__":
@@ -32,9 +32,11 @@ if __name__ == "__main__":
 
     client = Client((simulator_config.configuration["server_ip"],
                      simulator_config.configuration["server_port"]))
-
+    #connect to client
     if not client.isconnected():
         client.connect()
+
+    #set up simulator and send configuration
     simulator = Simulator(client, simulator_config)
     simulator.setup_logger()
     simulator.send_configuration()
@@ -44,7 +46,6 @@ if __name__ == "__main__":
                               "..", "configurations", "open_sense")
 
     # load sensors
-    # sensors = json.load(open(os.path.join(configPath, "sensors.json"), "r"))
     sensors = vehicle_config.sensor_configuration
     print(client.request(ConfigureSensorsCommand(sensors)))
 
@@ -53,10 +54,10 @@ if __name__ == "__main__":
     trajectory = json.load(open(os.path.join(configPath, "LeftTurnCrossWalk.json"), "r"))
     print(client.request(ConfigureTrajectoryCommand(trajectory)))
 
-    #if ManualDriveMode:
-        #vehicle = TeleportVehicle(simulator_config, vehicle_config)
-    #else:
-    vehicle = OpenSenseVehicle(simulator_config, vehicle_config)
+    if ManualDriveMode:
+        vehicle = TeleportVehicle(simulator_config, vehicle_config)
+    else:
+        vehicle = OpenSenseVehicle(simulator_config, vehicle_config)
 
     gui = GUI(vehicle, simulator)
     time.sleep(5)
@@ -66,8 +67,10 @@ if __name__ == "__main__":
     init = True
     # step simulation
     for i in range(0, len(trajectory)):
-        print(client.request(StepSimulationCommand(1)))
-        msg = EgoControlCommand(1.0, 1.0)
+        if i % 10 == 0:
+            print("Processing Trajectory {0}".format(i))
+        client.request(StepSimulationCommand(1))
+        msg = EgoControlCommand(0.0, 0.0)
         resp = client.request(msg)
         if resp is None:
             logging.getLogger("control").error(
