@@ -3,14 +3,9 @@ __copyright__ = "Copyright (C) 2018 monoDrive"
 __license__ = "MIT"
 __version__ = "1.0"
 
-import logging
-import math
-import numpy as np
-
 from . import BaseVehicle
 from monodrive.sensors import Waypoint, GPS
 from monodrive.models import Waypoint_Message, GPS_Message
-from monodrive.networking import messaging
 
 
 class LV_Vehicle(BaseVehicle):

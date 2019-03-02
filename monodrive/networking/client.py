@@ -93,7 +93,7 @@ class BaseClient(object):
                 message = None
 
             if message is None:
-                # logging.getLogger("network").info('TCPClient: remote disconnected, no more message')
+                logging.getLogger("network").debug('TCPClient: remote disconnected, no more message')
                 self.disconnect()
                 continue
 
@@ -156,7 +156,7 @@ class Client(object):
     def request(self, message, timeout=5):
         """ Return a response from Unreal """
         def do_request():
-            logging.getLogger('network').info('--> {0}'.format(message))
+            logging.getLogger('network').debug('--> {0}'.format(message))
             if not self.message_client.send(message):
                 return None
 
@@ -171,14 +171,8 @@ class Client(object):
         #while len(responses) < num_messages:
         try:
             response = self.responses.get(True, timeout)
-            logging.getLogger("network").info('<-- {0}'.format(response))
-            #responses.append(response)
+            logging.getLogger("network").debug('<-- {0}'.format(response))
         except Empty:
             logging.getLogger("network").error('Can not receive a response from server. \
                        timeout after {:0.2f} seconds'.format(timeout))
-            #responses.append(None)
-        #self.message_id += 1  # Increment only after the request/response cycle finished
-
-        #if num_messages == 1:
-        #    return responses[0]
         return response

@@ -31,8 +31,6 @@ REPLAY_StepSimulationCommand_ID         = "REPLAY_StepSimulationCommand_ID"
 REPLAY_ConfigureSensorsCommand_ID       = u"REPLAY_ConfigureSensorsCommand_ID"
 
 VELOVIEW_PORT = 2368
-#VELOVIEW_PORT = 11311
-
 VELOVIEW_IP = '127.0.0.1'
 
 BASE_PATH = os.path.dirname(os.path.dirname(__file__))

@@ -19,7 +19,7 @@ import threading
 import time
 
 from monodrive.networking import messaging
-from monodrive.transform import Rotation, Transform, Translation
+from monodrive.util.transform import Rotation, Transform, Translation
 
 BITS_PER_BYTE = 8.0
 BYTE_PER_MBYTE = 1000000.0
@@ -48,8 +48,6 @@ class BaseSensor(object):
         self.sock = None
 
         # synchronization
-        #self.q_data = SingleQueue()
-        #self.q_display = SingleQueue()
         self.q_data = multiprocessing.Queue(maxsize=10)
         self.q_display = multiprocessing.Queue(maxsize=10)
         self.socket_ready_event = multiprocessing.Event()

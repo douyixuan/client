@@ -282,7 +282,7 @@ class LidarGUISensor(GUISensor):
         if self.veloview_socket is None:
             return
 
-        print(">>>>>>> seding data to veloview", len(data))
+        #print(">>>>>>> seding data to veloview", len(data))
         if isinstance(data, list):
             for datum in data:
                 self.veloview_socket.sendto(datum, (VELOVIEW_IP, VELOVIEW_PORT))

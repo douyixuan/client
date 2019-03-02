@@ -13,6 +13,7 @@ if is_py2:
     import Queue as queue
 else:
     import queue as queue
+
 import struct
 import time
 import socket

@@ -7,8 +7,6 @@ __copyright__ = "Copyright (C) 2018 monoDrive"
 __license__ = "MIT"
 __version__ = "1.0"
 
-
-
 import json
 import random
 import struct
@@ -16,8 +14,6 @@ import sys
 
 from monodrive.constants import *
 
-from json import JSONEncoder
-import codecs
 
 class Message(object):
     """
@@ -70,14 +66,12 @@ class Message(object):
         magic = parsed_header[0]
         length = parsed_header[1]
 
-        #print("reading {0} bytes".format(length - 8))
         if magic == RESPONSE_HEADER and length > 8:
             self.raw_data = b''
             while len(self.raw_data) < length - 8:
                 left = length - 8 - len(self.raw_data)
                 self.raw_data += rfile.read(left)
 
-            #print("received {0}".format(len(self.raw_data)))
             payload = json.loads(self.raw_data.decode("utf-8"))
             self.reference = payload.get("reference", 0)
             self.type = payload['type']
@@ -88,8 +82,7 @@ class Message(object):
 
     def write(self, socket):
         """ Package JSON to send over TCP to Unreal Server. """
-        #data = umsgpack.packb(self.to_json())
-        payload = json.dumps(self.to_json()) #str(self.to_json()).encode('utf8')
+        payload = json.dumps(self.to_json())
         length = len(payload) + 8
         wfile = socket.makefile('wb', -1)
         wfile.write(struct.pack('!II', CONTROL_HEADER, length))
@@ -236,7 +229,7 @@ class StepSimulationCommand(Message):
     def __init__(self, value):
         super(StepSimulationCommand, self).__init__(
             REPLAY_StepSimulationCommand_ID,
-            { "amount": value }
+            {"amount": value }
         )
 
 
