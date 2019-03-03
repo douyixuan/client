@@ -62,7 +62,18 @@ class BaseVehicle(object):
         while not self.vehicle_stop.wait(self.vehicle_update_rate):
             if self.wait_for_drive_ready():
                 control = self.drive(sensors)
-                self.step(client, control)
+                self.step2(client, control)
+
+    def step2(self, client, control_data):
+        forward = control_data['forward']
+        right = control_data['right']
+        logging.getLogger("control").debug("Sending control data forward: %.4s, right: %.4s" % (forward, right))
+        msg = messaging.EgoControlCommand(forward, right)
+        #resp = self.simulator.request(msg)
+        resp = client.request(msg)
+        if resp is None:
+            logging.getLogger("control").error(
+                "Failed response from sending control data forward: %s, right: %s" % (forward, right))
 
     def step(self, client, control_data):
         self.control_thread = threading.Thread(target=self.do_control_thread(client, control_data))

@@ -171,7 +171,7 @@ class Base_Radar(BaseSensor):
         if not self.b_local_processing:
             payload = frame.decode('utf-8')
             payload = json.loads(payload)
-            print(payload)
+            #print(payload)
             radar_data['time_stamp'] = time_stamp
             radar_data['game_time'] = game_time
             radar_data['ranges'] = payload['message']['ranges']
