@@ -60,7 +60,7 @@ if __name__ == "__main__":
     time.sleep(5)
 
     vehicle.start_sensor_listening()
-    vehicle.init_vehicle_loop(client)
+    #vehicle.init_vehicle_loop(client)
     #
     init = True
     # step simulation
