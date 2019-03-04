@@ -106,8 +106,8 @@ class CameraPanel(wx.Panel):
 
 class MainFrame(wx.Frame):
     def __init__(self, sensors):
-        width = int(wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X) * .9)
-        height = int(wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) * .9)
+        width = int(wx.SystemSettings.GetMetric(wx.SYS_SCREEN_X) * .65)
+        height = int(wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) * 1.0)
         wx.Frame.__init__(self, None, size=(width, height), title = "monoDrive Visualizer")
         pub.subscribe(self.shutdown, "SHUTDOWN")
         # Here we create a panel and a notebook on the panel
@@ -173,19 +173,13 @@ class MonoDriveGUIApp(wx.App):
 
 class SensorPoll(Thread):
     """Thread to pull data from sensor q's and publish to views"""
-    def __init__(self, sensors, fps, map, clock_mode, vehicle_step_event):
+    def __init__(self, sensors, fps, map):
         super(SensorPoll,self).__init__()
-        #self.vehicle = vehicle
         #TODO need to fix the map getting here
         #self.road_map = vehicle.get_road_map()
         self.road_map = map
-        #self.sensors = vehicle.get_sensors()
         self.sensors = sensors
         self.stop_event = multiprocessing.Event()
-        self.vehicle_step_event = vehicle_step_event
-        self.clock_mode = clock_mode
-        self.fps = fps
-        self.update_gui_rate = 1.0 / float(fps)
         self.start()
 
     def update_sensor_widget(self, sensor):
@@ -202,6 +196,7 @@ class SensorPoll(Thread):
                 message['width'] = sensor.width
                 message['height'] = sensor.height
                 wx.CallAfter(pub.sendMessage, sensor.name, msg=message)
+                #pass
             elif "Bounding" in sensor.name:
                 wx.CallAfter(pub.sendMessage, "update_bounding_box", msg=message)
             elif "Radar" in sensor.name:
@@ -210,39 +205,20 @@ class SensorPoll(Thread):
                 sensor.forward_data(message)
         return found_data
 
-    def check_client_mode_update(self, sensor):
-        should_stop = False
-        wait_time = 0
-        updated = False
-        while not updated and not should_stop and wait_time < 2.0:
-            should_stop = self.stop_event.wait(self.update_gui_rate)
-            updated = self.update_sensor_widget(sensor)
-            wait_time += self.update_gui_rate
-
-        if not updated:
-            logging.getLogger("gui").debug("gui update skipped - sensor data not received (mode: ClockMode_ClientStep, stop_event = %s): %s"
-                                           % (should_stop, sensor.name))
-        return should_stop
-
     def update_gui(self, sensor):
         updated = self.update_sensor_widget(sensor)
-        if self.clock_mode == ClockMode_ClientStep:
-            if not updated and self.check_client_mode_update(sensor):
-                return False
-        return True
+        return updated
 
-    #this thread will run while application is running
+    # this thread will run while application is running
     def run(self):
-        while not self.stop_event.wait(self.update_gui_rate):
+        while not self.stop_event.wait(.5):
+            #start_time = time.time()
             for sensor in self.sensors:
                 if not self.update_gui(sensor):
                     break
-
-            if self.clock_mode == ClockMode_ClientStep and self.vehicle_step_event is not None:
-                self.vehicle_step_event.set()
-
             if self.road_map:
                 wx.CallAfter(pub.sendMessage, "update_roadmap", msg=self.road_map)
+            #print("gui_thread time = " + str(time.time() - start_time))
 
     def stop(self, timeout=2):
         self.stop_event.set()
@@ -264,11 +240,12 @@ class GUISensor(object):
             msg = self.queue.get(block=block, timeout=timeout)
             messages.append(msg)
             while self.queue.qsize():
-                msg = self.queue.get(block=True, timeout=0)
+                msg = self.queue.get(block=True, timeout=timeout)
                 messages.append(msg)
                 # If `False`, the program is not blocked. `Queue.Empty` is thrown if
                 # the queue is empty
         except Exception as e:
+            #print("exception =" + str(e))
             pass
         return messages
 
@@ -282,7 +259,6 @@ class LidarGUISensor(GUISensor):
         if self.veloview_socket is None:
             return
 
-        #print(">>>>>>> seding data to veloview", len(data))
         if isinstance(data, list):
             for datum in data:
                 self.veloview_socket.sendto(datum, (VELOVIEW_IP, VELOVIEW_PORT))
@@ -307,9 +283,9 @@ class GUI(object):
         super(GUI, self).__init__(**kwargs)
         self.daemon = True
         self.name = "GUI"
-        self.simulator_event = simulator.restart_event
-        self.vehicle_step_event = ego_vehicle.vehicle_step_event if ego_vehicle else None
-        self.vehicle_clock_mode = ego_vehicle.vehicle_config.clock_mode if ego_vehicle else 0
+        #self.simulator_event = simulator.restart_event
+        #self.vehicle_step_event = ego_vehicle.vehicle_step_event if ego_vehicle else None
+        # self.vehicle_clock_mode = ego_vehicle.vehicle_config.clock_mode if ego_vehicle else 0
         #for instance in ego_vehicle.sensor_process_dict:
         #    print(instance)
             #print(instance.name)
@@ -343,7 +319,7 @@ class GUI(object):
         self.start()
     
     def init_settings(self, settings):
-        default_update_rate = 1.0
+        default_update_rate = 10.0
         if settings:
             self.settings = settings
             self.fps = self.settings['fps']
@@ -375,11 +351,11 @@ class GUI(object):
 
         #prctl.set_proctitle("mono{0}".format(self.name))
         #start sensor polling
-        self.sensor_polling = SensorPoll(self.sensors, self.fps, self.map, self.vehicle_clock_mode, self.vehicle_step_event)
+        self.sensor_polling = SensorPoll(self.sensors, self.fps, self.map)
         while not self.stop_event.is_set():
             self.app.MainLoop()
-            self.simulator_event.set()
-            time.sleep(0.5)
+            #self.simulator_event.set()
+            time.sleep(0.05)
 
         monitor.join(timeout=2)
 

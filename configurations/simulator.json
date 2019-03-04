@@ -3,7 +3,7 @@
   "server_ip": "127.0.0.1",
   "server_port": 8999,
   "client_ip": "127.0.0.1",
-  "simulation_mode": 1,
+  "simulation_mode": 0,
   "phys_materials": {
     "Aluminum": {
       "specular_exponent": 15.0,
@@ -96,7 +96,7 @@
       "fps": 1.0
     },
     "logger": {
-      "sensor": "info",
+      "sensor": "debug",
       "network": "info",
       "control": "info",
       "scenario": "info",

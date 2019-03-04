@@ -87,10 +87,11 @@ class TeleportVehicle(BaseVehicle):
                         self.draw(screen)
                     else:
                         self.close()
-                        self.restart_event.set()
+                        self.vehicle_stop.set()
+                        #self.restart_event.set()
                         break
             
-            time.sleep(.1)
+            time.sleep(.01)
 
     def draw(self, screen, render_control=True):
         screen.fill((0, 0, 0))

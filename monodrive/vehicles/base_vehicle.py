@@ -36,14 +36,14 @@ class BaseVehicle(object):
         self.sensor_process_dict = {}
         self.init_sensors()
 
-        self.vehicle_update_rate = .1  # ticks per second
+        self.vehicle_update_rate = 10 # ticks per second
         self.vehicle_stop = multiprocessing.Event()
         self.vehicle_thread = None
         self.vehicle_step_event = multiprocessing.Event()
 
     def init_vehicle_loop(self, client):
         self.vehicle_thread = threading.Thread(target=self.vehicle_loop(client))
-        self.vehicle_thread.daemon = True
+        self.vehicle_thread.daemon = False
         self.vehicle_thread.start()
 
     def stop_vehicle(self, timeout=2):
@@ -54,23 +54,26 @@ class BaseVehicle(object):
     
     def vehicle_loop(self, client):
         # step the vehicle to start the measurements
-        self.step(client, {'forward': 0.0, 'right': 0.0})
+        #self.step(client, {'forward': 0.0, 'right': 0.0})
         
         sensors = self.get_sensors()
-        time.sleep(.1)
+        #time.sleep(5)
         # self.ready_event.set()
-        while not self.vehicle_stop.wait(self.vehicle_update_rate):
-            if self.wait_for_drive_ready():
-                control = self.drive(sensors)
-                self.step2(client, control)
+        while not self.vehicle_stop.wait(.25):
+            #start_time = time.time()
+            control = self.drive(sensors)
+            self.step2(client, control)
+            #print("vehicle_loop time = " + str(time.time() - start_time))
 
     def step2(self, client, control_data):
+        #start_time = time.time();
         forward = control_data['forward']
         right = control_data['right']
         logging.getLogger("control").debug("Sending control data forward: %.4s, right: %.4s" % (forward, right))
         msg = messaging.EgoControlCommand(forward, right)
-        #resp = self.simulator.request(msg)
         resp = client.request(msg)
+        #print("step time = " + str(time.time()-start_time))
+
         if resp is None:
             logging.getLogger("control").error(
                 "Failed response from sending control data forward: %s, right: %s" % (forward, right))
@@ -79,23 +82,11 @@ class BaseVehicle(object):
         self.control_thread = threading.Thread(target=self.do_control_thread(client, control_data))
         self.control_thread.start()
 
-    # This will wait for up to 2 seconds for all the sensor data and then proceed regardless
-    def wait_for_drive_ready(self):
-        should_drive = True
-        if self.vehicle_config.clock_mode == ClockMode_ClientStep:
-            wait_time = self.vehicle_update_rate
-            while wait_time < 2.0 and not self.vehicle_step_event.wait(self.vehicle_update_rate):
-                wait_time += self.vehicle_update_rate
-            self.vehicle_step_event.clear()
-            should_drive = not self.vehicle_stop.wait(0)
-        return should_drive
-
     def do_control_thread(self, client, control_data):
         forward = control_data['forward']
         right = control_data['right']
         logging.getLogger("control").debug("Sending control data forward: %.4s, right: %.4s" % (forward, right))
         msg = messaging.EgoControlCommand(forward, right)
-        #resp = self.simulator.request(msg)
         resp = client.request(msg)
         if resp is None:
             logging.getLogger("control").error(

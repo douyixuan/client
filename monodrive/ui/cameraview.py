@@ -25,14 +25,15 @@ class Camera_View(BufferedWindow):
     def update_view(self, msg):
         camera_msg = Camera_Message(msg)
         self.current_bitmap = self.to_bmp(camera_msg.np_image)
-        size = wx.Size(self.current_bitmap.GetWidth(), self.current_bitmap.GetHeight())
+        '''size = wx.Size(self.current_bitmap.GetWidth(), self.current_bitmap.GetHeight())
         if size != self.current_size:
             self.current_size = wx.Size(self.current_bitmap.GetWidth(), self.current_bitmap.GetHeight())
             self.SetMinSize(self.current_size)
 
         rect = wx.Rect((self.ClientSize.x - self.current_size.x) / 2, (self.ClientSize.y - self.current_size.y) / 2,
-                       self.current_size.x, self.current_size.y)
-        self.UpdateDrawing(rect)
+                       self.current_size.x, self.current_size.y)'''
+        self.UpdateDrawing()
+        #self.UpdateDrawing(rect)
 
     def to_bmp(self, np_image):
         imcv = cv2.cvtColor(np_image, cv2.COLOR_BGR2RGB)
@@ -40,7 +41,8 @@ class Camera_View(BufferedWindow):
         imwx = self.wxHelper.CreateImage(self.impil.size[0], self.impil.size[1])
         imwx.SetData(self.impil.convert('RGB').tobytes())
         bitmap = self.wxHelper.BitmapFromImage(imwx)
-        return self.scale_bitmap(bitmap)
+        return bitmap
+        #return self.scale_bitmap(bitmap)
 
     def scale_bitmap(self, bitmap):
         frame_size = self.ClientSize

@@ -30,15 +30,16 @@ if __name__ == "__main__":
 
     client = Client((simulator_config.configuration["server_ip"],
                      simulator_config.configuration["server_port"]))
-    #connect to client
+
+    # connect to client
     if not client.isconnected():
         client.connect()
 
-    #set up simulator and send configuration
+    # set up simulator and send configuration
     simulator = Simulator(client, simulator_config)
     simulator.setup_logger()
     simulator.send_configuration()
-    time.sleep(1)
+    #time.sleep(1)
 
     configPath = os.path.join(os.path.dirname(os.path.realpath(__file__)),
                               "..", "configurations", "open_sense")
@@ -55,12 +56,11 @@ if __name__ == "__main__":
     vehicle = TeleportVehicle(simulator_config, vehicle_config)
 
     gui = GUI(vehicle, simulator)
-    time.sleep(1)
+    #time.sleep(1)
 
     vehicle.start_sensor_listening()
     vehicle.init_vehicle_loop(client)
 
-    time.sleep(1)
 
     # Terminates vehicle and sensor processes
     vehicle.stop()
