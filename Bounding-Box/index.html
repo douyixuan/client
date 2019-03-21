@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Bounding Box - monoDrive Simulator</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Bounding Box";
+    var mkdocs_page_input_path = "Bounding-Box.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> monoDrive Simulator</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Configuration</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Configuration/">System</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Simulator-Configuration/">Simulator</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Vehicle-Configuration/">Vehicle</a>
+                </li>
+                <li class=" current">
+                    
+    <span class="caption-text">Sensors</span>
+    <ul class="subnav">
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Base-Sensor/">Common</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Radar/">Radar</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Lidar/">Lidar</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Multi-Camera/">Multi Camera</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Camera/">Camera</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../GPS/">GPS</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../IMU/">IMU</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Waypoint/">Waypoint</a>
+                </li>
+                <li class="toctree-l3 current">
+                    
+    <a class="current" href="./">Bounding Box</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l4"><a href="#bounding-box-sensor">Bounding Box Sensor</a></li>
+    
+
+    <li class="toctree-l4"><a href="#output-data">Output Data</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l5" href="#parsed-bounding-box-data-dictionary-keys-and-values">Parsed Bounding Box Data Dictionary Keys and Values.</a></li>
+        
+            <li><a class="toctree-l5" href="#raw-output-data-format-parsed-in-boundingboxdigest_frame">Raw Output Data Format Parsed in BoundingBox.digest_frame()</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../RPM/">RPM</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../test.md">LabVIEW Client</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Starting-Simulator/">Starting the Simulator</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">monoDrive Simulator</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Sensors &raquo;</li>
+        
+      
+        
+          <li>Configuration &raquo;</li>
+        
+      
+    
+    <li>Bounding Box</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/monodriveio/client/edit/master/docs/Bounding-Box.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="bounding-box-sensor">Bounding Box Sensor</h2>
+<p><p align="center">
+<img src="https://github.com/monoDriveIO/Client/raw/master/WikiPhotos/boundingboxsensor.PNG" width="400"  />
+</p></p>
+<p>The configuration for a bounding box sensor.</p>
+<pre><code>{
+      &quot;type&quot;: string,
+      &quot;id&quot;: string,
+      &quot;packet_size&quot;: int,
+      &quot;listen_port&quot;: int,
+      &quot;display_process&quot;: bool,
+      &quot;sensor_process&quot;: bool,
+      &quot;location&quot;: {
+        &quot;x&quot;: float,
+        &quot;y&quot;: float,
+        &quot;z&quot;: float
+      },
+      &quot;rotation&quot;: {
+        &quot;pitch&quot;: float,
+        &quot;yaw&quot;: float,
+        &quot;roll&quot;: float
+      },
+      &quot;fps&quot;: float
+    }
+</code></pre>
+
+<h2 id="output-data">Output Data</h2>
+<p>See <a href="../Base-Sensor/">base sensor</a> for examples on how to get the sensor. All data that comes from sensor queues is a dictionary.</p>
+<p><code>data_bounding_box = bounding_box.get_message()</code></p>
+<h3 id="parsed-bounding-box-data-dictionary-keys-and-values">Parsed Bounding Box Data Dictionary Keys and Values.</h3>
+<ul>
+<li><strong>time_stamp (int):</strong> Timestamp representing milliseconds since Sunday.</li>
+<li><strong>game_time (float):</strong> Current game time of simulator, this value will be more prominent.</li>
+<li><strong>distances (List<float<float>&gt;):</strong> Distances of targets from the Ego vehicle location.</li>
+<li><strong>angles (List<float<float>&gt;):</strong> Angles of targets relative to Ego vehicle's forward direction</li>
+<li><strong>x_points (List<float<float>&gt;):</strong> X points of targets relative to Ego vehicle's location</li>
+<li><strong>y_points (List<float<float>&gt;):</strong> Y points of targets relative to Ego vehicle's location</li>
+<li><strong>x_bounds (List<float<float>&gt;):</strong> Bounds of targets in the x direction, target widths</li>
+<li><strong>y_bounds (List<float<float>&gt;):</strong> Bounds of targets in the y direction, target lengths</li>
+<li><strong>box_rotations(List<float<float>&gt;):</strong> Rotation of targets relative to the Ego vehicle's rotation.</li>
+<li><strong>velocities (List<float<float>&gt;):</strong> Velocities of targets relative to the Ego Vehicle's speed</li>
+<li><strong>radar_distances (List<float<float>&gt;):</strong> Distances of targets from the Ego vehicle location that are in the Radar's FOV.</li>
+<li><strong>radar_angles (List<float<float>&gt;):</strong> Angles of targets relative to Ego vehicle's forward direction that are in the Radar's FOV</li>
+<li><strong>radar_velocities (List<float<float>&gt;):</strong> Velocities of targets relative to the Ego Vehicle's speed that are in the Radar's FOV.</li>
+</ul>
+<h3 id="raw-output-data-format-parsed-in-boundingboxdigest_frame">Raw Output Data Format Parsed in <code>BoundingBox.digest_frame()</code></h3>
+<ul>
+<li><strong>Bytes 0-2:</strong> Start Bytes</li>
+<li><strong>Bytes 2-6:</strong> Number of targets.</li>
+<li><strong>0...NumberOfTargets as i:</strong></li>
+<li><strong>Bytes 6+25i-10+25i:</strong> Distance bits represented as a float in single precision IEEE-754 format.</li>
+<li><strong>Bytes 10+25i-14+25i:</strong> Origin rotator yaw bits represented as a float in single precision IEEE-754 format.</li>
+<li><strong>Bytes 14+25i-18+25i:</strong> Bounds extent x bits represented as a float in single precision IEEE-754 format.</li>
+<li><strong>Bytes 18+25i-22+25i:</strong> Bounds extent y bits represented as a float in single precision IEEE-754 format.</li>
+<li><strong>Bytes 22+25i-26+25i:</strong> Relative rotation yaw bits represented as a float in single precision IEEE-754 format.</li>
+<li><strong>Bytes 26+25i-30+25i:</strong> Relative speed bits represented as a float in single precision IEEE-754 format.</li>
+<li><strong>Byte 30+25i-31+25i:</strong> Bool bit whether or not target is in field of view of the radar.</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../RPM/" class="btn btn-neutral float-right" title="RPM">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Waypoint/" class="btn btn-neutral" title="Waypoint"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/monodriveio/client/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Waypoint/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../RPM/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

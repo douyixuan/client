@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Starting the Simulator - monoDrive Simulator</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Starting the Simulator";
+    var mkdocs_page_input_path = "Starting-Simulator.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> monoDrive Simulator</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Configuration</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Configuration/">System</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Simulator-Configuration/">Simulator</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Vehicle-Configuration/">Vehicle</a>
+                </li>
+                <li class="">
+                    
+    <span class="caption-text">Sensors</span>
+    <ul class="subnav">
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Base-Sensor/">Common</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Radar/">Radar</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Lidar/">Lidar</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Multi-Camera/">Multi Camera</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Camera/">Camera</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../GPS/">GPS</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../IMU/">IMU</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Waypoint/">Waypoint</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Bounding-Box/">Bounding Box</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../RPM/">RPM</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../test.md">LabVIEW Client</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Starting the Simulator</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#client-control-flow-with-simulator">Client Control Flow with Simulator</a></li>
+    
+
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">monoDrive Simulator</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Starting the Simulator</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/monodriveio/client/edit/master/docs/Starting-Simulator.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="client-control-flow-with-simulator">Client Control Flow with Simulator</h2>
+<p><img src="https://github.com/monoDriveIO/client/raw/master/WikiPhotos/ControlFlow.PNG" width="600" height="400" />
+</p></p>
+<ol>
+<li>
+<p>Control:</p>
+<ul>
+<li>Create an instance of the <code>Simulator</code> class with the desired configuration and send the configuration to the simulator:
+    <code>simulator = Simulator(SimulatorConfiguration('simulator.json'))
+    simulator.send_configuration()</code></li>
+<li>
+<p>Get an instance of a vehicle of the desired type (<code>TeleportVehicle</code> is driven by the user, <code>SimpleVehicle</code> uses the <code>Waypoint</code> and <code>GPS</code> sensors to drive on it's own) and cofiguration:
+    <code>from monodrive.vehicles import TeleportVehicle
+    ...
+    vehicle_config = VehicleConfiguration('demo.json')
+    ego_vehicle = simulator.get_ego_vehicle(vehicle_config, TeleportVehicle)</code>
+      or
+    <code>from monodrive.vehicles import SimpleVehicle
+    ...
+    vehicle_config = VehicleConfiguration('demo.json')
+    ego_vehicle = simulator.get_ego_vehicle(vehicle_config, SimpleVehicle)</code>
+      <em>Note: the simulator currently supports only one ego vehicle instance per simulation session</em></p>
+</li>
+<li>
+<p>Send the vehicle configuration and start the vehicle process:
+    <code>simulator.send_vehicle_configuration(vehicle_config)
+    ego_vehicle.start()</code></p>
+</li>
+<li>Simulator: Each sensor will sample it's data and send it to the client.</li>
+</ul>
+</li>
+<li>
+<p>Sensor: Each sensor in the client will digest this data from the simulator and put the parsed data into both <code>q_display</code> and <code>q_data</code>. <code>q_display</code> is used for displaying the sensor's data in a graph, <code>q_data</code> is used in the Vehicle class to assist the Ego vehicle in driving.
+    <code>for sensor in ego_vehicle.sensors:
+                data = sensor.get_message()
+                # do something interesting with the data</code></p>
+</li>
+<li>
+<p>Vehicle: The <code>SimpleVehicle</code> class implements <code>drive(sensors)</code> to use the sensors' data to calculate control values for the Ego vehicle. These control values are sent to the simulator to control the vehicle.</p>
+</li>
+</ol>
+<p>The JSON format the simulator expects to control the ego vehicle.</p>
+<pre><code>{
+    &quot;forward_amount&quot;: float,
+    &quot;right_amount&quot;: float
+}
+</code></pre>
+
+<ul>
+<li><strong>forward_amount</strong>: Value from -1.0 to 1.0, negative being reverse</li>
+<li><strong>right_amount</strong>: Value from -1.0 to 1.0, negative being left</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../RPM/" class="btn btn-neutral" title="RPM"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/monodriveio/client/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../RPM/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

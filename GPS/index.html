@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>GPS - monoDrive Simulator</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "GPS";
+    var mkdocs_page_input_path = "GPS.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> monoDrive Simulator</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Configuration</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Configuration/">System</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Simulator-Configuration/">Simulator</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Vehicle-Configuration/">Vehicle</a>
+                </li>
+                <li class=" current">
+                    
+    <span class="caption-text">Sensors</span>
+    <ul class="subnav">
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Base-Sensor/">Common</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Radar/">Radar</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Lidar/">Lidar</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Multi-Camera/">Multi Camera</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Camera/">Camera</a>
+                </li>
+                <li class="toctree-l3 current">
+                    
+    <a class="current" href="./">GPS</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l4"><a href="#gps-sensor">GPS Sensor</a></li>
+    
+
+    <li class="toctree-l4"><a href="#output-data">Output Data</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l5" href="#parsed-gps-data-dictionary-keys-and-values">Parsed GPS Data Dictionary Keys and Values.</a></li>
+        
+            <li><a class="toctree-l5" href="#raw-output-data-format-parsed-in-gpsdigest_frame">Raw Output Data Format Parsed in GPS.digest_frame()</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../IMU/">IMU</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Waypoint/">Waypoint</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Bounding-Box/">Bounding Box</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../RPM/">RPM</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../test.md">LabVIEW Client</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Starting-Simulator/">Starting the Simulator</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">monoDrive Simulator</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Sensors &raquo;</li>
+        
+      
+        
+          <li>Configuration &raquo;</li>
+        
+      
+    
+    <li>GPS</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/monodriveio/client/edit/master/docs/GPS.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="gps-sensor">GPS Sensor</h2>
+<p><p align="center">
+<img src="https://github.com/monoDriveIO/Client/raw/master/WikiPhotos/gpssensor.PNG" />
+</p></p>
+<p>The configuration for a GPS sensor.</p>
+<pre><code>{
+      &quot;type&quot;: string,
+      &quot;id&quot;: string,
+      &quot;packet_size&quot;: int,
+      &quot;listen_port&quot;: int,
+      &quot;display_process&quot;: bool,
+      &quot;sensor_process&quot;: bool,
+      &quot;location&quot;: {
+        &quot;x&quot;: float,
+        &quot;y&quot;: float,
+        &quot;z&quot;: float
+      },
+      &quot;rotation&quot;: {
+        &quot;pitch&quot;: float,
+        &quot;yaw&quot;: float,
+        &quot;roll&quot;: float
+      },
+      &quot;fps&quot;: float
+}
+</code></pre>
+
+<h2 id="output-data">Output Data</h2>
+<p>See <a href="../Base-Sensor/">base sensor</a> for examples on how to get the sensor. All data that comes from sensor queues is a dictionary.</p>
+<p><code>data_gps = gps.get_message()</code></p>
+<h3 id="parsed-gps-data-dictionary-keys-and-values">Parsed GPS Data Dictionary Keys and Values.</h3>
+<ul>
+<li><strong>time_stamp (int):</strong> Timestamp representing milliseconds since Sunday.</li>
+<li><strong>game_time (float):</strong> Current game time of simulator, this value will be more prominent.</li>
+<li><strong>lat(float):</strong> Latitude of Ego vehicle.</li>
+<li><strong>lng(float):</strong> Longitude of Ego vehicle.</li>
+</ul>
+<h3 id="raw-output-data-format-parsed-in-gpsdigest_frame">Raw Output Data Format Parsed in <code>GPS.digest_frame()</code></h3>
+<p>Following the data format found <a href="https://github.com/swift-nav/libsbp/blob/master/docs/sbp.pdf">here</a>.</p>
+<ul>
+<li><strong>Byte 0-1:</strong> Start Byte</li>
+<li><strong>Bytes 1-3:</strong> MSG_POS_LLH</li>
+<li><strong>Bytes 3-5:</strong> Hash of the sensor id.</li>
+<li><strong>Byte 5-6:</strong> Length of the payload.</li>
+<li><strong>Bytes 6-14:</strong> Latitude bits represented as a double in double precision IEEE-754 format.</li>
+<li><strong>Bytes 14-22:</strong> Longitude bits represented as a double in double precision IEEE-754 format.</li>
+<li><strong>Bytes 22-30:</strong> Elevation bits represented as a double in double precision IEEE-754 format.</li>
+<li><strong>Bytes 30-32:</strong> Horizontal accuracy, in millimeters.</li>
+<li><strong>Bytes 32-34:</strong> Vertical accuracy, in millimeters.</li>
+<li><strong>Byte 34-35:</strong> Number of satellites used for signal.</li>
+<li><strong>Byte 35-36:</strong> Fixed more status.</li>
+<li><strong>Byte 36-37:</strong> CRC.</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../IMU/" class="btn btn-neutral float-right" title="IMU">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Camera/" class="btn btn-neutral" title="Camera"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/monodriveio/client/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Camera/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../IMU/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

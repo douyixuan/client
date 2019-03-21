@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Radar - monoDrive Simulator</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Radar";
+    var mkdocs_page_input_path = "Radar.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> monoDrive Simulator</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Installation/">Installation</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Configuration</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../Configuration/">System</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Simulator-Configuration/">Simulator</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../Vehicle-Configuration/">Vehicle</a>
+                </li>
+                <li class=" current">
+                    
+    <span class="caption-text">Sensors</span>
+    <ul class="subnav">
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Base-Sensor/">Common</a>
+                </li>
+                <li class="toctree-l3 current">
+                    
+    <a class="current" href="./">Radar</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l4"><a href="#radar-sensor">Radar Sensor</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l5" href="#output-data">Output Data</a></li>
+        
+            <li><a class="toctree-l5" href="#raw-output-data-format">Raw Output Data Format</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Lidar/">Lidar</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Multi-Camera/">Multi Camera</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Camera/">Camera</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../GPS/">GPS</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../IMU/">IMU</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Waypoint/">Waypoint</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../Bounding-Box/">Bounding Box</a>
+                </li>
+                <li class="toctree-l3">
+                    
+    <a class="" href="../RPM/">RPM</a>
+                </li>
+    </ul>
+                </li>
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../test.md">LabVIEW Client</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Starting-Simulator/">Starting the Simulator</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">monoDrive Simulator</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>Sensors &raquo;</li>
+        
+      
+        
+          <li>Configuration &raquo;</li>
+        
+      
+    
+    <li>Radar</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/monodriveio/client/edit/master/docs/Radar.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="radar-sensor">Radar Sensor</h2>
+<p>The configuration for a radar sensor.</p>
+<p align="center">
+<img src="https://github.com/monoDriveIO/Client/raw/master/WikiPhotos/radarsensor.PNG" />
+</p>
+
+<pre><code>{
+      &quot;type&quot;: string,
+      &quot;id&quot;: string,
+      &quot;packet_size&quot;: int,
+      &quot;listen_port&quot;: int,
+      &quot;display_process&quot;: bool,
+      &quot;sensor_process&quot;: bool,
+      &quot;location&quot;: {
+        &quot;x&quot;: float,
+        &quot;y&quot;: float,
+        &quot;z&quot;: float
+      },
+      &quot;rotation&quot;: {
+        &quot;pitch&quot;: float,
+        &quot;yaw&quot;: float,
+        &quot;roll&quot;: float
+      },
+      &quot;num_samples_per_sweep&quot;: int,
+      &quot;fs&quot;: int,
+      &quot;fc&quot;: float,
+      &quot;num_sweeps&quot;: int,
+      &quot;range_max&quot;: float,
+      &quot;sweep_num_for_range_max&quot;: float,
+      &quot;range_resolution&quot;: float,
+      &quot;max_velocity&quot;: float,
+      &quot;fps&quot;: int,
+      &quot;transmitter&quot;: {
+        &quot;aperture&quot;: float,
+        &quot;gain&quot;: float
+      },
+      &quot;receiver&quot;: {
+        &quot;aperture&quot;: float,
+        &quot;nf&quot;: float,
+        &quot;noise_temp&quot;: float,
+        &quot;nb&quot;: float,
+        &quot;gain&quot;: float,
+        &quot;kb&quot;: float
+      }
+}
+</code></pre>
+
+<ul>
+<li><strong>num_samples_per_sweep</strong>: </li>
+<li><strong>fs</strong>: </li>
+<li><strong>fc</strong>:  </li>
+<li><strong>num_sweeps</strong>: </li>
+<li><strong>range_max</strong>: </li>
+<li><strong>sweep_num_for_range_max</strong>: </li>
+<li><strong>range_resolution</strong>: </li>
+<li><strong>max_velocity</strong>: </li>
+<li><strong>transmitter</strong>:</li>
+<li><em>aperture</em>: </li>
+<li><em>gain</em>: </li>
+<li><strong>receiver</strong>:</li>
+<li><em>aperture</em>: </li>
+<li><em>nf</em>: </li>
+<li><em>noise_temp</em>: </li>
+<li><em>nb</em>: </li>
+<li><em>gain</em>: </li>
+<li><em>kb</em>: </li>
+</ul>
+<h3 id="output-data">Output Data</h3>
+<pre><code># See [base sensor](Base-Sensor.md) for examples on how to get the sensor.
+data_radar = radar.get_message()
+
+# The data in data_radar is a dictionary.
+game_time = data_radar['game_time']
+data = data_radar['data']
+</code></pre>
+
+<h3 id="raw-output-data-format">Raw Output Data Format</h3>
+<ul>
+<li><strong>0...NumberOfSweeps as i:</strong></li>
+<li><strong>Bytes 8i-4+8i:</strong> Real bits represented as a float in single precision IEEE-754 format.</li>
+<li><strong>Bytes 4+8i-8+8i:</strong> Imaginary bits represented as a float in single precision IEEE-754 format.</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Lidar/" class="btn btn-neutral float-right" title="Lidar">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href="../Base-Sensor/" class="btn btn-neutral" title="Common"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/monodriveio/client/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../Base-Sensor/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Lidar/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>
